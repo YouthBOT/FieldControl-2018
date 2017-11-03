@@ -1,0 +1,61 @@
+Northrop	Carroll
+Howe	Dekalb
+Canterbury	North Side
+Bellmont	South Adams
+West Noble	Anderson
+Leo	Bye
+Dekalb	Bellmont
+Carroll	Leo
+South Adams	West Noble
+North Side	Northrop
+Anderson	Canterbury
+Howe	Bye
+Leo	North Side
+Bellmont	Howe
+Northrop	Anderson
+West Noble	Dekalb
+Canterbury	South Adams
+Carroll	Bye
+Howe	West Noble
+North Side	Carroll
+Dekalb	Canterbury
+Anderson	Leo
+South Adams	Northrop
+Bellmont	Bye
+Carroll	Anderson
+West Noble	Bellmont
+Leo	South Adams
+Canterbury	Howe
+Northrop	Dekalb
+North Side	Bye
+Bellmont	Canterbury
+Anderson	North Side
+Howe	Northrop
+South Adams	Carroll
+Dekalb	Leo
+West Noble	Bye
+North Side	South Adams
+Canterbury	West Noble
+Carroll	Dekalb
+Northrop	Bellmont
+Leo	Howe
+West Noble	Northrop
+South Adams	Anderson
+Bellmont	Leo
+Dekalb	North Side
+Howe	Carroll
+Anderson	Dekalb
+Northrop	Canterbury
+North Side	Howe
+Leo	West Noble
+Carroll	Bellmont
+Canterbury	Leo
+Dekalb	South Adams
+West Noble	Carroll
+Howe	Anderson
+Canterbury	North Side
+South Adams	Howe
+Leo	Northrop
+Anderson	Bellmont
+Carroll	Canterbury
+North Side	West Noble
