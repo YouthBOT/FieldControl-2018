@@ -104,7 +104,7 @@ uint8_t delayMultiplier = 0;		//Report Delay Multiplier
 int messagesSent = 0;
 int messagesRecieved = 0;
 
-boolean sunState = false;			//Sun's state True = on, False = off
+boolean speedMode = false;			//Sun's state True = on, False = off
 boolean alarmState = false;			//Alarm state True = on, False = off
 boolean testedState = false;		//Tower's teseted state True = tested, False = not tested
 
@@ -409,34 +409,19 @@ void execute()
 		if (canIn[1] == 1)
 		{
 			towerSelected = true;
-			selectedState = canIn[2];
-			if (selectedState == 1)
-			{
-				wipeColor(yellow, 0, 1, firstPixel(3), lastPixel(4));
-				sunState = true;
-			}
-			else if (selectedState == 2)
-			{
-				wipeColor(red, 0, 1, firstPixel(2), lastPixel(2));
-				alarmState = true;
-			}
-
 		}
 		else
 		{
 			towerSelected = false;
+		}
 
-			if (sunState)
-			{
-				sunState = false;
-				solidColor(blue, 0, firstPixel(3), lastPixel(4));
-			}
-			if (alarmState)
-			{
-				alarmState = false;
-				solidColor(blue, 0, firstPixel(2), lastPixel(2));
-			}
-
+		if (canIn[2] == 1)
+		{
+			speedMode = true;
+		}
+		else
+		{
+			speedMode = false;
 		}
 	}
 }
@@ -465,12 +450,7 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			if(!sunState) solidColor(blue, 0, 0, stripLength);
-			else
-			{
-				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
-				solidColor(blue, 0, firstPixel(1), lastPixel(2));
-			}
+			solidColor(blue, 0, 0, stripLength);
 
 			gameModeChanged = false;
 
@@ -533,27 +513,43 @@ void gamePlayCanbus()
 			}
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
-			if (!sunState) solidColor(blue, 0, 0, stripLength);
-			else
-			{
-				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
-				solidColor(blue, 0, firstPixel(1), lastPixel(2));
-			}
 			gameModeChanged = false;
 			complete = false;
 		}
 
-		//if (!complete)
-		//{
-		//	if (towerSelected)
-		//	{
-		//		solidColor(yellow, 0, 0, stripLength);
-		//	}
-		//	else
-		//	{
-		//		solidColor(off, 0, 0, stripLength);
-		//	}
-		//}
+		if (!complete)
+		{
+			if (!speedMode)
+			{
+				alarmColor(yellow, 10, 1, 0, stripLength);
+			}
+			else
+			{
+				if (towerSelected)
+				{
+					byte oldState = nodeStatus[4];
+					updateInputs();
+
+					if (oldState != nodeStatus[4])
+					{
+						boolean button1 = inputStates[1];
+						boolean button2 = inputStates[0];
+
+						if (button1 || button2)
+						{
+							report(0, commandNode);
+							towerSelected = false;
+							byte _color = nodeStatus[1];
+							flashColor(_color, 0, 3, 0, stripLength);
+						}
+					}
+				}
+				else
+				{
+					solidColor(off, 0, 0, stripLength);
+				}
+			}
+		}
 	}
 	else if (gameMode == 6)	//End
 	{
@@ -784,7 +780,7 @@ void gamePlaySpeedTest()
 	{
 		if (gameModeChanged)
 		{
-			if (!sunState) solidColor(blue, 0, 0, stripLength);
+			if (!speedMode) solidColor(blue, 0, 0, stripLength);
 			else
 			{
 				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
@@ -832,7 +828,7 @@ void gamePlaySpeedTest()
 			}
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
-			if (!sunState) solidColor(blue, 0, 0, stripLength);
+			if (!speedMode) solidColor(blue, 0, 0, stripLength);
 			else
 			{
 				solidColor(yellow, 0, firstPixel(3), lastPixel(4));
@@ -1215,6 +1211,53 @@ void wipeColor(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _startPix
 			light.setPixelColor(i, _color);	//Set pixel to the color
 			light.show();					//Turn it on
 			delay(_wait);					//Wait
+		}
+
+	}
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+/// <method>	alarmColor() </method>
+///
+/// <summary>	Fills in neopixels one after another till the ring or stip is filled </summary>
+///
+/// <param name="_color">  		color </param>
+/// <param name="_wait">	   	wait between pixels </param>
+/// <param name="_times">   	number of times the alarm should repeat </param>
+/// <param name="_startPix">	first pixel to light </param>
+/// <param name="_endPix">  	last pixel to light </param>
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void alarmColor(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _startPix, uint8_t _endPix)
+{
+	nodeStatus[1] = colorCode(_color);
+	nodeStatus[2] = 4;
+
+	//If wait is zero set to defualt
+	if (_wait == 0) _wait = 10;
+
+	//if time is zero set to 1 so it will at least do it once
+	if (_times == 0) _times = 1;
+
+	//loop for the command number of times
+	for (uint8_t i = 0; i < _times; i++)
+	{
+		//turn on pixels one at a time starting with the first and ending with the last
+		for (uint8_t i = _startPix; i < _endPix; i++)
+		{
+			light.setPixelColor(i, _color);	//Set pixel to the color
+			uint8_t next = 0;
+			for (uint8_t j = pixPerRing; j < (stripLength - pixPerRing); j + pixPerRing)
+			{
+				next = i + j;
+				if (next <= _endPix)
+				{
+					light.setPixelColor(next, _color);
+				}
+			}
+			light.show();					//Turn it on
+			delay(_wait);					//Wait
+			if (next == stripLength) i = _endPix;
 		}
 
 	}
