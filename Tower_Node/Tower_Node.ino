@@ -463,17 +463,45 @@ void gamePlayCanbus()
 			}
 		}
 
-		/*if (!complete)
+		byte oldState = nodeStatus[4];
+		updateInputs();
+
+		if (oldState != nodeStatus[4])
 		{
-			if (towerSelected)
+			boolean button1 = inputStates[0];
+			boolean button2 = inputStates[1];
+			boolean switchUp = inputStates[2];
+			boolean switchDown = inputStates[3];
+
+
+			if (!complete)
 			{
-				solidColor(yellow, 0, 0, stripLength);
+				if ((nodeID == 3) || (nodeID == 8))
+				{
+					if (switchDown)
+					{
+						report(0, commandNode);
+						towerSelected = false;
+						byte _color = nodeStatus[1];
+						flashColor(_color, 0, 3, 0, stripLength);
+						solidColor(_color, 0, 0, stripLength);
+						complete = true;
+					}
+				}
+				else
+				{
+					if (button1 || button2)
+					{
+						report(0, commandNode);
+						towerSelected = false;
+						byte _color = nodeStatus[1];
+						flashColor(_color, 0, 3, 0, stripLength);
+						solidColor(_color, 0, 0, stripLength);
+						complete = true;
+					}
+				}
 			}
-			else
-			{
-				solidColor(blue, 0, 0, stripLength);
-			}
-		}*/
+		}
 	}
 	else if (gameMode == 4)	//Man-Tonomous
 	{
@@ -521,7 +549,8 @@ void gamePlayCanbus()
 		{
 			if (!speedMode)
 			{
-				alarmColor(yellow, 10, 1, 0, stripLength);
+				//alarmColor(yellow, 10, 1, 0, stripLength);
+				wipeColor(yellow, 20, 1, 0, stripLength);
 			}
 			else
 			{
@@ -1245,19 +1274,22 @@ void alarmColor(uint32_t _color, uint8_t _wait, uint8_t _times, uint8_t _startPi
 		//turn on pixels one at a time starting with the first and ending with the last
 		for (uint8_t i = _startPix; i < _endPix; i++)
 		{
-			light.setPixelColor(i, _color);	//Set pixel to the color
 			uint8_t next = 0;
+			light.setPixelColor(i, _color);	//Set pixel to the color
+			light.setPixelColor((i + 4), _color);
+
 			for (uint8_t j = pixPerRing; j < (stripLength - pixPerRing); j + pixPerRing)
 			{
 				next = i + j;
 				if (next <= _endPix)
 				{
 					light.setPixelColor(next, _color);
+					light.setPixelColor((next + 4), _color);
 				}
 			}
 			light.show();					//Turn it on
 			delay(_wait);					//Wait
-			if (next == stripLength) i = _endPix;
+			if (next >= stripLength) i = _endPix;
 		}
 
 	}
