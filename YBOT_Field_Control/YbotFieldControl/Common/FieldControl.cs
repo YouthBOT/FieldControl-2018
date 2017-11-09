@@ -202,7 +202,7 @@ namespace YbotFieldControl
         /// </summary>
         public void ShutDown()
         {
-            this.cb.Shutdown();
+            cb.Shutdown();
         }
 
         /// <summary>
@@ -330,15 +330,16 @@ namespace YbotFieldControl
         /// <summary>
         /// Set's node's mode to off
         /// </summary>
-        public void FieldAllOff()
-        {
-            if (canbusPresent)
-            {
-                this.cb.Send("0,7,0,0,");
+        public void FieldAllOff() {
+            if (canbusPresent) {
+                cb.Send("0,7,0,0,");
                 Thread.Sleep(20);
-                this.cb.ChangeGameMode(0, GameModes.off);
+                cb.ChangeGameMode(0, GameModes.off);
                 Thread.Sleep(20);
+
+                AllFieldLights (LightColor.off, State.off);
             }
+
             ClearNodeState();
         }
         #endregion
@@ -356,9 +357,9 @@ namespace YbotFieldControl
         public void Light(int _nodeID, LightColor _color1, LightColor _color2, LightColor _color3, LightColor _color4)
         {
             string colorState = string.Format("{0}|{1}|{2}|{3}", _color1.ToString(), _color2.ToString(), _color3.ToString(), _color4.ToString());
-            this.node[_nodeID].lightStatus = colorState;
+            node[_nodeID].lightStatus = colorState;
             ComModes mode = new ComModes();
-            mode = this.node[_nodeID].type;
+            mode = node[_nodeID].type;
 
             switch (mode)
             {
@@ -386,16 +387,14 @@ namespace YbotFieldControl
         /// <param name="_nodeID">Node's ID Value</param>
         /// <param name="_color">Color Value</param>
         /// <param name="_state">on, off</param>
-        public void Light(int _nodeID, LightColor _color)
-        {
+        public void Light(int _nodeID, LightColor _color) {
             ComModes mode = new ComModes();
-            mode = this.node[_nodeID].type;
+            mode = node[_nodeID].type;
 
-            switch (mode)
-            {
+            switch (mode) {
                 case ComModes.canBus:
                     int nodeAddress = Convert.ToInt32(this.node[_nodeID].address);
-                    this.cb.Light(nodeAddress, _color);
+                    cb.Light(nodeAddress, _color);
                     break;
 
                 case ComModes.xBee:
@@ -416,9 +415,10 @@ namespace YbotFieldControl
         /// </summary>
         /// <param name="_color">Color Value</param>
         /// <param name="_state">on, off</param>
-        public void AllFieldLights(LightColor _color, State _state)
-        {
-            if (canbusPresent) cb.Light(0, _color);
+        public void AllFieldLights(LightColor _color, State _state) {
+            if (canbusPresent) {
+                cb.Light (0, _color);
+            }
         }
 
         /// <summary>
@@ -538,10 +538,8 @@ namespace YbotFieldControl
         /// <summary>
         /// Update All Nodes state
         /// </summary>
-        public void UpdateNodeState(object sender, CanMessageEventArgs e)
-        { 
-            try
-            {
+        public void UpdateNodeState(object sender, CanMessageEventArgs e) { 
+            try {
                 //Parse incoming data
                 string[] parsedString = e.canMessage.Split(',');
 
@@ -549,63 +547,35 @@ namespace YbotFieldControl
                 if (nodeID == cv.canControlID) nodeID = 0;
                 else if (nodeID > 20) nodeID -= 10;
 
-                this.node[nodeID].reportRec = Convert.ToByte(parsedString[1]);
+                node[nodeID].reportRec = Convert.ToByte(parsedString[1]);
 
                 //Console.WriteLine("Incomming Message : Node {1}: {0}", e.canMessage, nodeID);
 
-                if (this.node[nodeID].reportRec == 9)
-                {
-                    this.node[nodeID].fromPC = Convert.ToInt32(parsedString[2]);
-                    this.node[nodeID].toPC = Convert.ToInt32(parsedString[3]);
-                    this.node[nodeID].commandNodeMessagesReceived = Convert.ToInt32(parsedString[4]);
-                    this.node[nodeID].commandNodeMessagesSent = Convert.ToInt32(parsedString[5]);
-                    this.node[nodeID].nodeMessagesReceived = Convert.ToInt32(parsedString[6]);
-                    this.node[nodeID].nodeMessagesSent = Convert.ToInt32(parsedString[7]);
+                if (node[nodeID].reportRec == 9) {
+                    node[nodeID].fromPC = Convert.ToInt32(parsedString[2]);
+                    node[nodeID].toPC = Convert.ToInt32(parsedString[3]);
+                    node[nodeID].commandNodeMessagesReceived = Convert.ToInt32(parsedString[4]);
+                    node[nodeID].commandNodeMessagesSent = Convert.ToInt32(parsedString[5]);
+                    node[nodeID].nodeMessagesReceived = Convert.ToInt32(parsedString[6]);
+                    node[nodeID].nodeMessagesSent = Convert.ToInt32(parsedString[7]);
 
-                    this.node[cv.controlBoard].nodeMessagesSent = Convert.ToInt32(parsedString[4]);
-                    this.node[cv.controlBoard].nodeMessagesReceived = Convert.ToInt32(parsedString[5]);
+                    node[cv.controlBoard].nodeMessagesSent = Convert.ToInt32(parsedString[4]);
+                    node[cv.controlBoard].nodeMessagesReceived = Convert.ToInt32(parsedString[5]);
 
+                } else {
+                    node[nodeID].lightStatus = this.cb.colorCode(parsedString[2]);
+                    node[nodeID].lightMode = parsedString[3];
+                    node[nodeID].gameMode = this.cb.gameModeCode(parsedString[4]);
+                    node[nodeID].inputStatus = Convert.ToByte(parsedString[5]);
+                    node[nodeID].outputStatus = Convert.ToByte(parsedString[6]);
+                    node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
+                    node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
+
+                    // <TODO> determine switch inputs
                 }
-                else
-                {
-                    this.node[nodeID].lightStatus = this.cb.colorCode(parsedString[2]);
-                    this.node[nodeID].lightMode = parsedString[3];
-                    this.node[nodeID].gameMode = this.cb.gameModeCode(parsedString[4]);
-                    this.node[nodeID].inputStatus = Convert.ToByte(parsedString[5]);
-                    this.node[nodeID].outputStatus = Convert.ToByte(parsedString[6]);
-                    this.node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
-                    this.node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
-
-                    if (!this.node[nodeID].tested)
-                    {
-                        if (this.node[nodeID].byte7 == 8) this.node[nodeID].tested = true;
-                        else this.node[nodeID].tested = false;
-                    }
-
-                    if (!this.node[nodeID].deviceCycled)
-                    {
-                        if (this.node[nodeID].byte7 == 2)
-                        {
-                            this.node[nodeID].deviceCycled = true;
-                            this.node[nodeID].alarmState = false;
-                        }
-                        else this.node[nodeID].deviceCycled = false;
-                    }
-
-                    if (!this.node[nodeID].alarmState)
-                    {
-                        if (this.node[nodeID].byte7 == 1)
-                        {
-                            this.node[nodeID].alarmState = true;
-                            this.node[nodeID].deviceCycled = false;
-                        }
-                        else this.node[nodeID].alarmState = false;
-                    }
-
-                }
+            } catch (Exception ex) {
+                logWrite ("Update Node Failed - " + ex);
             }
-            catch (Exception ex) { logWrite("Update Node Failed - " + ex); }
-
         }
 
         /// <summary>
@@ -653,73 +623,48 @@ namespace YbotFieldControl
         /// <returns></returns>
         public bool InputState(int _nodeID, int input)
         {
-            if (this.node[_nodeID].type == ComModes.canBus)
+            if (node[_nodeID].type == ComModes.canBus)
             {
                 int check = 1 << input;
                 int i = node[_nodeID].inputStatus & check;
                 if (i == check) return true;
-                else return false;
+                return false;
             }
-            else return false;
+            return false;
         }
 
         /// <summary>
         /// Clear all node variables
         /// </summary>
-        public void ClearNodeState()
-        {
-            foreach (Nodes nd in node)
-            {
-                this.node[nd.id].reportRec = 0;
-                this.node[nd.id].lightStatus = "off";
-                this.node[nd.id].lightMode = "0";
-                this.node[nd.id].gameMode = "off";
-                this.node[nd.id].inputStatus = 0;
-                this.node[nd.id].outputStatus = 0;
-                this.node[nd.id].byte6 = 0;
-                this.node[nd.id].byte7 = 0;
-                this.node[nd.id].scored = false;
-
-                //This year's game variables
-                this.node[nd.id].tested = false;
-                this.node[nd.id].deviceCycled = false;
-                this.node[nd.id].alarmState = false;
-            }
+        public void ClearNodeState() {
+            ClearNodeState(false);
         }
 
         /// <summary>
         /// Clear some node variables
         /// </summary>
         /// <param name="selective">True = some; False = all</param>
-        public void ClearNodeState(bool selective)
-        {
-            foreach (Nodes nd in node)
-            {
-                this.node[nd.id].reportRec = 0;
-                this.node[nd.id].lightStatus = "off";
-                this.node[nd.id].lightMode = "0";            
-                this.node[nd.id].inputStatus = 0;
-                this.node[nd.id].outputStatus = 0;
-                this.node[nd.id].byte6 = 0;
-                this.node[nd.id].byte7 = 0;
-                this.node[nd.id].scored = false;
+        public void ClearNodeState(bool selective) {
+            foreach (Nodes nd in node) {
+                node[nd.id].reportRec = 0;
+                node[nd.id].lightStatus = "off";
+                node[nd.id].lightMode = "0";            
+                node[nd.id].inputStatus = 0;
+                node[nd.id].outputStatus = 0;
+                node[nd.id].byte6 = 0;
+                node[nd.id].byte7 = 0;
+                node[nd.id].scored = false;
 
-                this.node[nd.id].deviceCycled = false;
-
-                if (!selective)
-                {
-
-                    this.node[nd.id].alarmState = false;
-                    this.node[nd.id].tested = false;                  
-                    this.node[nd.id].gameMode = "off";
+                if (!selective) {             
+                    node[nd.id].gameMode = "off";
                 }
             }
         }
 
         public void ResetTestVariables()
         {
-            this.cb.messagesSent = 0;
-            this.cb.messagesReceived = 0;
+            cb.messagesSent = 0;
+            cb.messagesReceived = 0;
         }
         #endregion
 
@@ -756,36 +701,26 @@ namespace YbotFieldControl
         /// <param name="_teamColor">Team's color (red, green)</param>
         /// <param name="_autoState">Autonomous on, off</param>
         /// <param name="_transmitterState">Transmitters on, off</param>
-        public void RobotTransmitters(string _teamColor, State _autoState, State _transmitterState)
-        {
-            if (_teamColor == "green")
-            {
-                if (node[cv.greenTeam_Node].type == ComModes.canBus)
-                {
-                    int nodeAddress = Convert.ToInt32(this.node[cv.greenTeam_Node].address);
-                    this.cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
+        public void RobotTransmitters(string _teamColor, State _autoState, State _transmitterState) {
+            if (_teamColor == "green") {
+                if (node[cv.greenTeam_Node].type == ComModes.canBus) {
+                    int nodeAddress = Convert.ToInt32(node[cv.greenTeam_Node].address);
+                    cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
                 }
-            }
-            else if (_teamColor == "red")
-            {
-                if (node[cv.redTeam_Node].type == ComModes.canBus)
-                {
-                    int nodeAddress = Convert.ToInt32(this.node[cv.redTeam_Node].address);
-                    this.cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
+            } else if (_teamColor == "red") {
+                if (node[cv.redTeam_Node].type == ComModes.canBus) {
+                    int nodeAddress = Convert.ToInt32(node[cv.redTeam_Node].address);
+                    cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
                 }
-            }
-            else
-            {
-                if (node[cv.greenTeam_Node].type == ComModes.canBus)
-                {
-                    int nodeAddress = Convert.ToInt32(this.node[cv.greenTeam_Node].address);
-                    this.cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
+            } else {
+                if (node[cv.greenTeam_Node].type == ComModes.canBus) {
+                    int nodeAddress = Convert.ToInt32(node[cv.greenTeam_Node].address);
+                    cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
                 }
 
-                if (node[cv.redTeam_Node].type == ComModes.canBus)
-                {
-                    int nodeAddress = Convert.ToInt32(this.node[cv.redTeam_Node].address);
-                    this.cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
+                if (node[cv.redTeam_Node].type == ComModes.canBus) {
+                    int nodeAddress = Convert.ToInt32(node[cv.redTeam_Node].address);
+                    cb.RobotTransmitters(nodeAddress, _autoState, _transmitterState);
                 }
             }
         }
@@ -793,17 +728,15 @@ namespace YbotFieldControl
         /// <summary>
         /// Ring Field Bell
         /// </summary>
-        public void RingBell()
-        {
-            this.cb.Send("31, 100");
+        public void RingBell() {
+            cb.Send("31, 100");
         }
 
         /// <summary>
         /// Sounds Field Buzzer
         /// </summary>
-        public void SoundBuzzer()
-        {
-            this.cb.Send("31, 101");
+        public void SoundBuzzer() {
+            cb.Send("31, 101");
         }
 
         /// <summary>
@@ -811,18 +744,18 @@ namespace YbotFieldControl
         /// </summary>
         /// <param name="mode">Game Mode Value</param>
         /// <returns></returns>
-        public GameModes ChangeGameMode(GameModes mode)
-        {
+        public GameModes ChangeGameMode(GameModes mode) {
             switchMode = true;
-            foreach (Nodes nd in node)
-            {
+
+            foreach (Nodes nd in node) {
                 node[nd.id].gameMode = mode.ToString();
             }
-            if (canbusPresent)
-            {
-                this.cb.ChangeGameMode(0, mode);
+
+            if (canbusPresent) {
+                cb.ChangeGameMode(0, mode);
                 Thread.Sleep(10);
             }
+
             return mode;
         }
 
@@ -832,14 +765,12 @@ namespace YbotFieldControl
         /// <param name="_nodeID">Node ID Value</param>
         /// <param name="mode">Game Mode Value</param>
         /// <returns></returns>
-        public GameModes ChangeGameMode(int _nodeID, GameModes mode)
-        {
+        public GameModes ChangeGameMode(int _nodeID, GameModes mode) {
             switchMode = true;
 
-            if (node[_nodeID].type == ComModes.canBus)
-            {
+            if (node[_nodeID].type == ComModes.canBus) {
                 int nodeAddress = Convert.ToInt32(this.node[_nodeID].address);   //Get Address
-                this.cb.ChangeGameMode(nodeAddress, mode);
+                cb.ChangeGameMode(nodeAddress, mode);
                 Thread.Sleep(10);
             }
 
@@ -847,12 +778,10 @@ namespace YbotFieldControl
             return mode;
         }
 
-        public void ChangeGameFunction(int function, int functionMode, string option)
-        {
-            if (canbusPresent)
-            {
+        public void ChangeGameFunction(int function, int functionMode, string option) {
+            if (canbusPresent) {
                 string s = string.Format("0,6,{0},{1},{2}", function, functionMode, option);
-                this.cb.Send(s);
+                cb.Send(s);
             }
         }
 

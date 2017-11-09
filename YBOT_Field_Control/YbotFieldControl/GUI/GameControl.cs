@@ -27,10 +27,10 @@ namespace YbotFieldControl
             this.fc = fc;
 
             btnAdvanceTeam = new Button();
-            btnAdvanceTeam.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            btnAdvanceTeam.Location = new System.Drawing.Point(895, 125);
+            btnAdvanceTeam.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
+            btnAdvanceTeam.Location = new Point(895, 125);
             btnAdvanceTeam.Name = "btnAdvanceTeam";
-            btnAdvanceTeam.Size = new System.Drawing.Size(100, 75);
+            btnAdvanceTeam.Size = new Size(100, 75);
             btnAdvanceTeam.Text = "Advance Team";
             btnAdvanceTeam.UseVisualStyleBackColor = true;
             btnAdvanceTeam.Visible = false;
@@ -43,8 +43,52 @@ namespace YbotFieldControl
             }
         }
 
+        private void OnSqlConnect (object sender) {
+            InitializeSqlData ();
+            YbotSql.Instance.SqlConnectedEvent -= OnSqlConnect;
+        }
+
+        private void InitializeSqlData () {
+            if (btnTournamentNext.InvokeRequired) {
+                btnTournamentNext.Invoke ((MethodInvoker)delegate () {
+                    btnTournamentNext.Visible = true;
+                });
+            } else {
+                btnTournamentNext.Visible = true;
+            }
+
+            if (btnTournamentPrev.InvokeRequired) {
+                btnTournamentPrev.Invoke ((MethodInvoker)delegate () {
+                    btnTournamentPrev.Visible = true;
+                });
+            } else {
+                btnTournamentPrev.Visible = true;
+            }
+
+            foreach (var t in YBotSqlData.Global.tournaments) {
+                if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
+                    YBotSqlData.Global.currentTournament = t.name;
+                }
+            }
+
+            YBotSqlData.Global.currentMatchNumber = 0;
+            if (YBotSqlData.Global.currentTournament.IsEmpty ()) {
+                YBotSqlData.Global.currentTournament = "Field Testing";
+            }
+
+            if (lblTournamentName.InvokeRequired) {
+                lblTournamentName.Invoke ((MethodInvoker)delegate () {
+                    lblTournamentName.Visible = true;
+                    lblTournamentName.Text = YBotSqlData.Global.currentTournament;
+                });
+            } else {
+                lblTournamentName.Visible = true;
+                lblTournamentName.Text = YBotSqlData.Global.currentTournament;
+            }
+        }
+
         #region Game Controls
-        
+
         #region Penalties
 
         #region Green Penalties
@@ -278,27 +322,40 @@ namespace YbotFieldControl
 
         #region Game Controls
 
-        private void btnStartGame_Click(object sender, EventArgs e)
-        {
-            autoModeTime = 60;
-            manAutoTime = 20;
-            midModeTime = 240;
-
-            disableGameButtons();
-            btnStop.BackColor = GameControl.DefaultBackColor;
-            btnStartGame.BackColor = Color.LimeGreen;
+        private void btnStartGame_Click(object sender, EventArgs e) {
             ClearDisplay();
+            DisableGameButtons();
+
+            lblGameClock.ForeColor = Color.Blue;
+            GD.lblGameClock.ForeColor = Color.Blue;
+
             GameStartUp();
-            gameTimer.Start();
-            time.countDownStart(4, 1);
+
+            autoModeTime = 30;
+            manAutoTime = 0;
+            midModeTime = 90;
+            time.CountDownStart(2, 30);
             time.timesUp = false;
-            MainGame();
+            gameTimer.Start();
+
+            MainGame ();
         }
 
-        private void btnPracticeMode_Click(object sender, EventArgs e)
-        {
-            disableGameButtons();
-            btnStop.BackColor = GameControl.DefaultBackColor;
+        private void btnStop_Click (object sender, EventArgs e) {
+            GameShutDown ();
+            EnableGameButtons ();
+
+            gameTimer.Stop ();
+            practiceTimer.Stop ();
+            testTimer.Stop ();
+
+            GameLog ("Field Off");
+            LogGame ();
+        }
+
+        private void btnPracticeMode_Click(object sender, EventArgs e) {
+            DisableGameButtons();
+            btnStop.BackColor = DefaultBackColor;
             btnPracticeMode.BackColor = Color.LimeGreen;
             ClearDisplay();
             GameStartUp(GameModes.debug);
@@ -309,10 +366,9 @@ namespace YbotFieldControl
             MainGame();
         }
 
-        private void btnAutoMode_Click(object sender, EventArgs e)
-        {
-            disableGameButtons();
-            btnStop.BackColor = GameControl.DefaultBackColor;
+        private void btnAutoMode_Click(object sender, EventArgs e) {
+            DisableGameButtons();
+            btnStop.BackColor = DefaultBackColor;
             btnAutoMode.BackColor = Color.LimeGreen;
             ClearDisplay();
             GameStartUp(GameModes.autonomous);
@@ -324,10 +380,9 @@ namespace YbotFieldControl
             MainGame();
         }
 
-        private void btnManualMode_Click(object sender, EventArgs e)
-        {
-            disableGameButtons();
-            btnStop.BackColor = GameControl.DefaultBackColor;
+        private void btnManualMode_Click(object sender, EventArgs e) {
+            DisableGameButtons();
+            btnStop.BackColor = DefaultBackColor;
             btnManualMode.BackColor = Color.LimeGreen;
             ClearDisplay();
             GameStartUp(GameModes.manual);
@@ -339,24 +394,20 @@ namespace YbotFieldControl
             MainGame();
         }
 
-        private void btnTestMode_Click(object sender, EventArgs e)
-        {
+        private void btnTestMode_Click(object sender, EventArgs e) {
             if (btnTestMode.BackColor == DefaultBackColor)
             {
-                disableGameButtons();
-                btnStop.BackColor = GameControl.DefaultBackColor;
+                DisableGameButtons();
+                btnStop.BackColor = DefaultBackColor;
                 btnTestMode.BackColor = Color.LimeGreen;
                 testTimer.Start();
                 TestMode();
-            }
-            else
-            {
+            } else {
                 btnStop.PerformClick();
             }
         }
 
-        private void TestMode()
-        {
+        private void TestMode() {
             autoModeTime = 5;
             manAutoTime =  0;
             midModeTime = 10;
@@ -366,35 +417,13 @@ namespace YbotFieldControl
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.countDownStart(0, 11);
+            time.CountDownStart(0, 11);
             time.timesUp = false;
             MainGame();
         }
 
-        private void btnStop_Click(object sender, EventArgs e)
-        {
-            //Turn on all Hub Channel
-            fc.FieldAllOff();
-            gameTimer.Stop();
-            practiceTimer.Stop();
-            testTimer.Stop();
-            btnStop.BackColor = Color.Red;
-            btnStartGame.BackColor = GameControl.DefaultBackColor;
-            btnAutoMode.BackColor = GameControl.DefaultBackColor;
-            btnManualMode.BackColor = GameControl.DefaultBackColor;
-            btnPracticeMode.BackColor = GameControl.DefaultBackColor;
-            btnTestMode.BackColor = GameControl.DefaultBackColor;
-            gameMode = GameModes.off;
-            GameShutDown();
-            enableGameButtons();
-            GameLog("Field Off");
-            LogGame();
-        }
-
-        private void btnMatchNext_Click(object sender, EventArgs e)
-        {
-            if (this.gameMode == GameModes.off)
-            {
+        private void btnMatchNext_Click(object sender, EventArgs e) {
+            if (gameMode == GameModes.off) {
                 matchNumber++;
                 lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
@@ -404,10 +433,8 @@ namespace YbotFieldControl
             }
         }
 
-        private void btnMatchPrev_Click(object sender, EventArgs e)
-        {
-            if (this.gameMode == GameModes.off)
-            {
+        private void btnMatchPrev_Click(object sender, EventArgs e) {
+            if (gameMode == GameModes.off) {
                 if (matchNumber > 0) matchNumber--;
                 lblMatchNumber.Text = "Match " + matchNumber.ToString();
                 GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
@@ -417,8 +444,7 @@ namespace YbotFieldControl
             }
         }
 
-        private void lblMatchNumber_Click(object sender, EventArgs e)
-        {
+        private void lblMatchNumber_Click(object sender, EventArgs e) {
             GetTeamNames();
         }
 
@@ -478,39 +504,35 @@ namespace YbotFieldControl
             }
         }
 
-        private void lblGreenScore_Click(object sender, EventArgs e)
-        {
+        private void lblGreenScore_Click(object sender, EventArgs e) {
             ClearDisplay();
         }
 
-        private void lblRedScore_Click(object sender, EventArgs e)
-        {
+        private void lblRedScore_Click(object sender, EventArgs e) {
             ClearDisplay();
         }
 
-        private void lblGameClock_Click(object sender, EventArgs e)
-        {
+        private void lblGameClock_Click(object sender, EventArgs e) {
             ClearDisplay();
         }
 
-        private void UpdateGame()
-        { 
-            MainGame();
-            updateDisplays();
-            if (!red.autoMan && (fc.node[3].gameMode == GameModes.mantonomous.ToString()))
-            {
+        private void UpdateGame () {
+            MainGame ();
+            UpdateDisplays ();
+
+            /*
+            if (!red.autoMan && (fc.node[3].gameMode == GameModes.mantonomous.ToString())) {
                 red.autoMan = true;
                 btnRedMantonomous.BackColor = Color.Red;
                 btnRedMantonomous.ForeColor = Color.Black;
             }
-            if (!green.autoMan && (fc.node[8].gameMode == GameModes.mantonomous.ToString()))
-            {
+
+            if (!green.autoMan && (fc.node[8].gameMode == GameModes.mantonomous.ToString())) {
                 green.autoMan = true;
                 btnGreenMantonomous.BackColor = Color.Lime;
                 btnGreenMantonomous.ForeColor = Color.Black;
             }
-
-            if (green.autoMan && red.autoMan) joint.autoMan = true;
+            */
         }
 
         // Not used this year
@@ -766,22 +788,30 @@ namespace YbotFieldControl
 			}
         }
 
-        private void disableGameButtons()
-        {
+        private void DisableGameButtons () {
             btnStartGame.Enabled = false;
             btnAutoMode.Enabled = false;
             btnManualMode.Enabled = false;
             btnPracticeMode.Enabled = false;
             btnTestMode.Enabled = false;
+
+            btnStop.BackColor = DefaultBackColor;
+            btnStartGame.BackColor = Color.LimeGreen;
         }
 
-        private void enableGameButtons()
-        {
+        private void EnableGameButtons () {
             btnStartGame.Enabled = true;
             btnAutoMode.Enabled = true;
             btnManualMode.Enabled = true;
             btnPracticeMode.Enabled = true;
             btnTestMode.Enabled = true;
+
+            btnStop.BackColor = Color.Red;
+            btnStartGame.BackColor = DefaultBackColor;
+            btnAutoMode.BackColor = DefaultBackColor;
+            btnManualMode.BackColor = DefaultBackColor;
+            btnPracticeMode.BackColor = DefaultBackColor;
+            btnTestMode.BackColor = DefaultBackColor;
         }
 
 		private void btnTournamentNext_Click(object sender, EventArgs e) {
@@ -890,59 +920,14 @@ namespace YbotFieldControl
 
         #region Display
 
-        private void updateDisplays()
-        {
-            lblGreenScore.Text = this.green.score.ToString();
-            lblRedScore.Text = this.red.score.ToString();
-            GD.lblGreenScore.Text = this.green.score.ToString();
-            GD.lblRedScore.Text = this.red.score.ToString();
+        private void UpdateDisplays () {
+            lblGameClock.Text = time.CountDownStatus ();
+            GD.lblGameClock.Text = lblGameClock.Text.ToString ();
 
-            if (solarOverride) btnScorePanel.BackColor = Color.LimeGreen;
-            else btnScorePanel.BackColor = DefaultBackColor;
-        }
-
-        private void OnSqlConnect (object sender) {
-            InitializeSqlData ();
-            YbotSql.Instance.SqlConnectedEvent -= OnSqlConnect;
-        }
-
-        private void InitializeSqlData () {
-            if (btnTournamentNext.InvokeRequired) {
-                btnTournamentNext.Invoke ((MethodInvoker)delegate () {
-                    btnTournamentNext.Visible = true;
-                });
-            } else {
-                btnTournamentNext.Visible = true;
-            }
-
-            if (btnTournamentPrev.InvokeRequired) {
-                btnTournamentPrev.Invoke ((MethodInvoker)delegate () {
-                    btnTournamentPrev.Visible = true;
-                });
-            } else {
-                btnTournamentPrev.Visible = true;
-            }
-
-            foreach (var t in YBotSqlData.Global.tournaments) {
-                if (t.date.Date.CompareTo (DateTime.Now.Date) == 0) {
-                    YBotSqlData.Global.currentTournament = t.name;
-                }
-            }
-
-            YBotSqlData.Global.currentMatchNumber = 0;
-            if (YBotSqlData.Global.currentTournament.IsEmpty ()) {
-                YBotSqlData.Global.currentTournament = "Field Testing";
-            }
-
-            if (lblTournamentName.InvokeRequired) {
-                lblTournamentName.Invoke ((MethodInvoker)delegate () {
-                    lblTournamentName.Visible = true;
-                    lblTournamentName.Text = YBotSqlData.Global.currentTournament;
-                });
-            } else {
-                lblTournamentName.Visible = true;
-                lblTournamentName.Text = YBotSqlData.Global.currentTournament;
-            }
+            lblGreenScore.Text = green.score.ToString();
+            lblRedScore.Text = red.score.ToString();
+            GD.lblGreenScore.Text = green.score.ToString();
+            GD.lblRedScore.Text = red.score.ToString();
         }
 
         public Screen GetSecondaryScreen()
@@ -965,71 +950,66 @@ namespace YbotFieldControl
 
         private void ClearDisplay()
         {
-            if (this.gameMode == GameModes.off)
-            {
-                lblGameClock.Text = "4:00";
-                GD.lblGameClock.Text = "4:00";
+            if (gameMode == GameModes.off) {
+                lblGameClock.Text = "2:30";
+                GD.lblGameClock.Text = "2:30";
+
+                lblGameClock.ForeColor = Color.Black;
+                GD.lblGameClock.ForeColor = Color.Black;
 
                 lblRedScore.Text = "000";
+                GD.lblRedScore.Text = "000";
                 lblGreenScore.Text = "000";
                 GD.lblGreenScore.Text = "000";
-                GD.lblRedScore.Text = "000";
 
-                lblGreenPenalty1.BackColor = GameControl.DefaultBackColor;
+                lblGreenPenalty1.BackColor = DefaultBackColor;
                 lblGreenPenalty1.ForeColor = Color.Lime;
-                GD.lblGreenPenalty1.BackColor = GameControl.DefaultBackColor;
-                GD.lblGreenPenalty1.ForeColor = GameControl.DefaultBackColor;
+                GD.lblGreenPenalty1.BackColor = DefaultBackColor;
+                GD.lblGreenPenalty1.ForeColor = DefaultBackColor;
 
-                lblGreenPenalty2.BackColor = GameControl.DefaultBackColor;
+                lblGreenPenalty2.BackColor = DefaultBackColor;
                 lblGreenPenalty2.ForeColor = Color.Lime;
-                GD.lblGreenPenalty2.BackColor = GameControl.DefaultBackColor;
-                GD.lblGreenPenalty2.ForeColor = GameControl.DefaultBackColor;
+                GD.lblGreenPenalty2.BackColor = DefaultBackColor;
+                GD.lblGreenPenalty2.ForeColor = DefaultBackColor;
 
-                lblGreenPenalty3.BackColor = GameControl.DefaultBackColor;
+                lblGreenPenalty3.BackColor = DefaultBackColor;
                 lblGreenPenalty3.ForeColor = Color.Lime;
-                GD.lblGreenPenalty3.BackColor = GameControl.DefaultBackColor;
-                GD.lblGreenPenalty3.ForeColor = GameControl.DefaultBackColor;
+                GD.lblGreenPenalty3.BackColor = DefaultBackColor;
+                GD.lblGreenPenalty3.ForeColor = DefaultBackColor;
 
-                lblGreenDQ.BackColor = GameControl.DefaultBackColor;
+                lblGreenDQ.BackColor = DefaultBackColor;
                 lblGreenDQ.ForeColor = Color.Lime;
-                GD.lblGreenDQ.BackColor = GameControl.DefaultBackColor;
-                GD.lblGreenDQ.ForeColor = GameControl.DefaultBackColor;
+                GD.lblGreenDQ.BackColor = DefaultBackColor;
+                GD.lblGreenDQ.ForeColor = DefaultBackColor;
 
-                lblRedPenalty1.BackColor = GameControl.DefaultBackColor;
+                lblRedPenalty1.BackColor = DefaultBackColor;
                 lblRedPenalty1.ForeColor = Color.Red;
-                GD.lblRedPenalty1.BackColor = GameControl.DefaultBackColor;
-                GD.lblRedPenalty1.ForeColor = GameControl.DefaultBackColor;
+                GD.lblRedPenalty1.BackColor = DefaultBackColor;
+                GD.lblRedPenalty1.ForeColor = DefaultBackColor;
 
-                lblRedPenalty2.BackColor = GameControl.DefaultBackColor;
+                lblRedPenalty2.BackColor = DefaultBackColor;
                 lblRedPenalty2.ForeColor = Color.Red;
-                GD.lblRedPenalty2.BackColor = GameControl.DefaultBackColor;
-                GD.lblRedPenalty2.ForeColor = GameControl.DefaultBackColor;
+                GD.lblRedPenalty2.BackColor = DefaultBackColor;
+                GD.lblRedPenalty2.ForeColor = DefaultBackColor;
 
-                lblRedPenalty3.BackColor = GameControl.DefaultBackColor;
+                lblRedPenalty3.BackColor = DefaultBackColor;
                 lblRedPenalty3.ForeColor = Color.Red;
-                GD.lblRedPenalty3.BackColor = GameControl.DefaultBackColor;
-                GD.lblRedPenalty3.ForeColor = GameControl.DefaultBackColor;
+                GD.lblRedPenalty3.BackColor = DefaultBackColor;
+                GD.lblRedPenalty3.ForeColor = DefaultBackColor;
 
-                lblRedDQ.BackColor = GameControl.DefaultBackColor;
+                lblRedDQ.BackColor = DefaultBackColor;
                 lblRedDQ.ForeColor = Color.Red;
-                GD.lblRedDQ.BackColor = GameControl.DefaultBackColor;
-                GD.lblRedDQ.ForeColor = GameControl.DefaultBackColor;
-
-                //Current Year's Game
-
-                btnRedMantonomous.BackColor = GameControl.DefaultBackColor;
-                btnRedMantonomous.ForeColor = Color.Red;
-                btnGreenMantonomous.BackColor = GameControl.DefaultBackColor;
-                btnGreenMantonomous.ForeColor = Color.Lime;
+                GD.lblRedDQ.BackColor = DefaultBackColor;
+                GD.lblRedDQ.ForeColor = DefaultBackColor;
 
             }
         }
 
         private void GameControl_FormClosed (object sender, FormClosedEventArgs e) 
         {
-            this.btnStop.PerformClick ();
-            this.fc.ChangeGameMode (GameModes.off);
-            this.gameMode = GameModes.off;
+            btnStop.PerformClick ();
+            fc.ChangeGameMode (GameModes.off);
+            gameMode = GameModes.off;
             YBotSqlData.Global.currentMatchNumber = -1;
             YBotSqlData.Global.currentTournament = string.Empty;
         }
@@ -1037,93 +1017,71 @@ namespace YbotFieldControl
         #endregion
 
         #region Timers
-        private void gameTimer_Tick(object sender, EventArgs e)
-        {
-            timeKeeper();
-            updateTime();
+        private void gameTimer_Tick(object sender, EventArgs e) {
+            TimeKeeper();
             UpdateGame();
         }
 
-        private void practiceTimer_Tick(object sender, EventArgs e)
-        {
+        private void practiceTimer_Tick(object sender, EventArgs e) {
             UpdateGame();
         }
 
-        private void updateTime()
-        {
-            lblGameClock.Text = this.time.countDownStatus();
-            GD.lblGameClock.Text = lblGameClock.Text.ToString();
-        }
+        private void TimeKeeper () {
+            // Game has finished
+            if (time.timesUp) {
+                GameShutDown ();
+                gameMode = fc.ChangeGameMode (GameModes.end);
 
-        private void timeKeeper()
-        {
-            if (this.time.timesUp)
-            {
-                if (!this.fc.switchMode)
-                {
-                    updateDisplays();
-                    this.GameShutDown();
-                    this.gameMode = this.fc.ChangeGameMode(GameModes.end);
-                    lblGameClock.Text = ("0:00");
-                    this.GameLog("Game Stopped");
-                    this.gameTimer.Stop();
-                    this.LogGame();
-                }
+                lblGameClock.Text = "0:00";
+                GD.lblGameClock.Text = "0:00";
+                lblGameClock.ForeColor = Color.Black;
+                GD.lblGameClock.ForeColor = Color.Black;
+
+                GameLog ("Game Stopped");
+                gameTimer.Stop ();
+
+                LogGame ();
             }
+            // In auto mode and not passed auto time
+            else if (gameMode == GameModes.autonomous && !time.CheckTimeElapsed (autoModeTime)) {
 
-            else if (this.gameMode == GameModes.autonomous && !this.time.Timer(this.autoModeTime))
-            {
-
-                if (this.time.Timer(this.manAutoTime))
-                {
-                    lblGameClock.ForeColor = Color.Blue;
-                    GD.lblGameClock.ForeColor = Color.Blue;
-                }
-                else
-                {
-                    lblGameClock.ForeColor = Color.Red;
-                    GD.lblGameClock.ForeColor = Color.Red;
-                }
             }
-
-            else if (this.gameMode == GameModes.autonomous && this.time.Timer(this.autoModeTime))
-            {
-
-                this.gameMode = this.fc.ChangeGameMode(GameModes.manual);
-            }
-
-            else if (this.gameMode == GameModes.manual && !this.time.Timer(this.midModeTime))
-            {
+            // In auto mode and passed auto time
+            else if (gameMode == GameModes.autonomous && time.CheckTimeElapsed (autoModeTime)) {
+                gameMode = fc.ChangeGameMode (GameModes.manual);
                 lblGameClock.ForeColor = Color.Black;
                 GD.lblGameClock.ForeColor = Color.Black;
             }
-            else
-            {
-                lblGameClock.ForeColor = Color.Black;
-                GD.lblGameClock.ForeColor = Color.Black;
-                this.gameMode = this.fc.ChangeGameMode(GameModes.end);
-                this.updateDisplays();
-                this.GameShutDown();
-                Thread.Sleep(1000);
-                this.GameLog("Game Stopped");
+            // In manual mode and not passed manual time
+            else if (gameMode == GameModes.manual && !time.CheckTimeElapsed (midModeTime)) {
+
+            }
+            // In manual mode and passed mid point time
+            else if (gameMode == GameModes.manual && time.CheckTimeElapsed (midModeTime)) {
+                gameMode = fc.ChangeGameMode (GameModes.speed);
+            }
+            // In speed mode
+            else if (gameMode == GameModes.speed) {
+
+            } else {
+                throw new Exception ("This is for testing purposes. This should never be reached");
             }
         }
 
         private void testTimer_Tick(object sender, EventArgs e)
         {
-            if(this.gameMode == GameModes.end)
+            if(gameMode == GameModes.end)
             {
                 //this.red.finalScore = this.red.score;
                 //this.green.finalScore = this.green.score;
                 //this.ScoreGame();
                 //this.RecordGame();
                 Thread.Sleep(200);
-                this.fc.FieldAllOff();
+                fc.FieldAllOff();
                 Thread.Sleep(1000);
-                this.gameMode = GameModes.off;
+                gameMode = GameModes.off;
                 Thread.Sleep(100);
                 //GameShutDown();
-
 
                 //if (this.red.score != this.green.score)
                 //{
@@ -1145,22 +1103,6 @@ namespace YbotFieldControl
         //------------------------------------------------------------------------------------------------\\
         //Current year's game methods
         //------------------------------------------------------------------------------------------------\\
-
-        private void btnGreenPlus_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void btnGreenMinus_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void btnRedPlus_Click(object sender, EventArgs e)
-        {
-        }
-
-        private void btnRedMinus_Click(object sender, EventArgs e)
-        {
-        }
 
         private void btnGreenMantonomous_Click(object sender, EventArgs e)
         {
@@ -1198,38 +1140,9 @@ namespace YbotFieldControl
             }
         }
 
-        private void btnHomePanel_Click(object sender, EventArgs e)
-        {
-            if (this.gameMode == GameModes.off)
-            {
-                btnHomePanel.BackColor = Color.Blue;
-                string str = ("7,1,3,");
-                this.fc.SendMessage(solarPanel, str);
-                Thread.Sleep(15000);
-                btnHomePanel.BackColor = DefaultBackColor;
-            }
-        }
-
-        private void btnResetSolarPanelPosistion_Click(object sender, EventArgs e)
-        {
-            if (this.gameMode != GameModes.off)
-            {
-                string str = ("7,1,5,");
-                this.fc.SendMessage(solarPanel, str);
-            }
-        }
-
-        private void btnScorePanel_Click(object sender, EventArgs e)
-        {
-            this.fc.node[11].byte6 = 1;
-            solarOverride = true;
-        }
-
-        private void btnStopScoringPanel_Click(object sender, EventArgs e)
-        {
-            this.fc.node[11].byte6 = 0;
-            solarOverride = false;
-        }
+        //string str = ("7,1,3,");
+        //fc.SendMessage(solarPanel, str);
+     
     }
 
     //Vertical Progress Bar 

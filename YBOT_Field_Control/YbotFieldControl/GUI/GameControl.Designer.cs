@@ -74,15 +74,9 @@
             this.btnTournamentNext = new System.Windows.Forms.Button();
             this.btnTournamentPrev = new System.Windows.Forms.Button();
             this.lblTournamentName = new System.Windows.Forms.Label();
-            this.btnHomePanel = new System.Windows.Forms.Button();
-            this.solarTimer = new System.Windows.Forms.Timer(this.components);
-            this.sunChangeTimer = new System.Windows.Forms.Timer(this.components);
             this.lblChampionshipRounds = new System.Windows.Forms.Label();
             this.btnChampionshipRoundNext = new System.Windows.Forms.Button();
             this.btnChampionshipRoundPrevious = new System.Windows.Forms.Button();
-            this.btnStopScoringPanel = new System.Windows.Forms.Button();
-            this.btnScorePanel = new System.Windows.Forms.Button();
-            this.btnResetSolarPanelPosistion = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -106,7 +100,6 @@
             this.btnGreenPlus.Text = "+";
             this.btnGreenPlus.UseVisualStyleBackColor = false;
             this.btnGreenPlus.Visible = false;
-            this.btnGreenPlus.Click += new System.EventHandler(this.btnGreenPlus_Click);
             // 
             // lblGreenPenalty1
             // 
@@ -115,7 +108,7 @@
             this.lblGreenPenalty1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblGreenPenalty1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGreenPenalty1.ForeColor = System.Drawing.Color.Lime;
-            this.lblGreenPenalty1.Location = new System.Drawing.Point(19, 22);
+            this.lblGreenPenalty1.Location = new System.Drawing.Point(6, 22);
             this.lblGreenPenalty1.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblGreenPenalty1.Name = "lblGreenPenalty1";
             this.lblGreenPenalty1.Size = new System.Drawing.Size(87, 40);
@@ -131,7 +124,7 @@
             this.lblGreenPenalty2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblGreenPenalty2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGreenPenalty2.ForeColor = System.Drawing.Color.Lime;
-            this.lblGreenPenalty2.Location = new System.Drawing.Point(19, 83);
+            this.lblGreenPenalty2.Location = new System.Drawing.Point(6, 83);
             this.lblGreenPenalty2.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblGreenPenalty2.Name = "lblGreenPenalty2";
             this.lblGreenPenalty2.Size = new System.Drawing.Size(87, 40);
@@ -147,7 +140,7 @@
             this.lblGreenPenalty3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblGreenPenalty3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblGreenPenalty3.ForeColor = System.Drawing.Color.Lime;
-            this.lblGreenPenalty3.Location = new System.Drawing.Point(19, 147);
+            this.lblGreenPenalty3.Location = new System.Drawing.Point(6, 147);
             this.lblGreenPenalty3.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblGreenPenalty3.Name = "lblGreenPenalty3";
             this.lblGreenPenalty3.Size = new System.Drawing.Size(87, 40);
@@ -195,7 +188,7 @@
             this.lblRedPenalty1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblRedPenalty1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblRedPenalty1.ForeColor = System.Drawing.Color.Red;
-            this.lblRedPenalty1.Location = new System.Drawing.Point(13, 22);
+            this.lblRedPenalty1.Location = new System.Drawing.Point(10, 22);
             this.lblRedPenalty1.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblRedPenalty1.Name = "lblRedPenalty1";
             this.lblRedPenalty1.Size = new System.Drawing.Size(87, 40);
@@ -211,7 +204,7 @@
             this.lblRedPenalty3.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblRedPenalty3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblRedPenalty3.ForeColor = System.Drawing.Color.Red;
-            this.lblRedPenalty3.Location = new System.Drawing.Point(13, 147);
+            this.lblRedPenalty3.Location = new System.Drawing.Point(10, 147);
             this.lblRedPenalty3.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblRedPenalty3.Name = "lblRedPenalty3";
             this.lblRedPenalty3.Size = new System.Drawing.Size(87, 40);
@@ -227,7 +220,7 @@
             this.lblRedPenalty2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.lblRedPenalty2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblRedPenalty2.ForeColor = System.Drawing.Color.Red;
-            this.lblRedPenalty2.Location = new System.Drawing.Point(13, 83);
+            this.lblRedPenalty2.Location = new System.Drawing.Point(10, 83);
             this.lblRedPenalty2.MinimumSize = new System.Drawing.Size(50, 40);
             this.lblRedPenalty2.Name = "lblRedPenalty2";
             this.lblRedPenalty2.Size = new System.Drawing.Size(87, 40);
@@ -243,14 +236,13 @@
             this.btnRedPlus.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnRedPlus.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRedPlus.ForeColor = System.Drawing.Color.Black;
-            this.btnRedPlus.Location = new System.Drawing.Point(1006, 295);
+            this.btnRedPlus.Location = new System.Drawing.Point(1006, 215);
             this.btnRedPlus.Name = "btnRedPlus";
             this.btnRedPlus.Size = new System.Drawing.Size(103, 60);
             this.btnRedPlus.TabIndex = 160;
             this.btnRedPlus.Text = "+";
             this.btnRedPlus.UseVisualStyleBackColor = false;
             this.btnRedPlus.Visible = false;
-            this.btnRedPlus.Click += new System.EventHandler(this.btnRedPlus_Click);
             // 
             // btnRedMinus
             // 
@@ -259,14 +251,13 @@
             this.btnRedMinus.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnRedMinus.Font = new System.Drawing.Font("Microsoft Sans Serif", 30F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRedMinus.ForeColor = System.Drawing.Color.Black;
-            this.btnRedMinus.Location = new System.Drawing.Point(1006, 215);
+            this.btnRedMinus.Location = new System.Drawing.Point(1006, 295);
             this.btnRedMinus.Name = "btnRedMinus";
             this.btnRedMinus.Size = new System.Drawing.Size(103, 60);
             this.btnRedMinus.TabIndex = 159;
             this.btnRedMinus.Text = "-";
             this.btnRedMinus.UseVisualStyleBackColor = false;
             this.btnRedMinus.Visible = false;
-            this.btnRedMinus.Click += new System.EventHandler(this.btnRedMinus_Click);
             // 
             // btnGameDisplay
             // 
@@ -306,7 +297,6 @@
             this.btnGreenMinus.Text = "-";
             this.btnGreenMinus.UseVisualStyleBackColor = false;
             this.btnGreenMinus.Visible = false;
-            this.btnGreenMinus.Click += new System.EventHandler(this.btnGreenMinus_Click);
             // 
             // lblGreenTeam
             // 
@@ -692,30 +682,6 @@
             this.lblTournamentName.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblTournamentName.Visible = false;
             // 
-            // btnHomePanel
-            // 
-            this.btnHomePanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnHomePanel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnHomePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHomePanel.Location = new System.Drawing.Point(440, 255);
-            this.btnHomePanel.Margin = new System.Windows.Forms.Padding(10);
-            this.btnHomePanel.Name = "btnHomePanel";
-            this.btnHomePanel.Size = new System.Drawing.Size(314, 55);
-            this.btnHomePanel.TabIndex = 166;
-            this.btnHomePanel.Text = "Home Panel";
-            this.btnHomePanel.UseVisualStyleBackColor = false;
-            this.btnHomePanel.Click += new System.EventHandler(this.btnHomePanel_Click);
-            // 
-            // solarTimer
-            // 
-            this.solarTimer.Interval = 1000;
-            this.solarTimer.Tick += new System.EventHandler(this.solarTimer_Tick);
-            // 
-            // sunChangeTimer
-            // 
-            this.sunChangeTimer.Interval = 60000;
-            this.sunChangeTimer.Tick += new System.EventHandler(this.sunChangeTimer_Tick);
-            // 
             // lblChampionshipRounds
             // 
             this.lblChampionshipRounds.Anchor = System.Windows.Forms.AnchorStyles.Top;
@@ -756,60 +722,14 @@
             this.btnChampionshipRoundPrevious.Visible = false;
             this.btnChampionshipRoundPrevious.Click += new System.EventHandler(this.btnChampionshipRound_Click);
             // 
-            // btnStopScoringPanel
-            // 
-            this.btnStopScoringPanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnStopScoringPanel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnStopScoringPanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnStopScoringPanel.Location = new System.Drawing.Point(663, 380);
-            this.btnStopScoringPanel.Margin = new System.Windows.Forms.Padding(10);
-            this.btnStopScoringPanel.Name = "btnStopScoringPanel";
-            this.btnStopScoringPanel.Size = new System.Drawing.Size(314, 50);
-            this.btnStopScoringPanel.TabIndex = 170;
-            this.btnStopScoringPanel.Text = "Stop Scoring Panel";
-            this.btnStopScoringPanel.UseVisualStyleBackColor = false;
-            this.btnStopScoringPanel.Click += new System.EventHandler(this.btnStopScoringPanel_Click);
-            // 
-            // btnScorePanel
-            // 
-            this.btnScorePanel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnScorePanel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnScorePanel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnScorePanel.Location = new System.Drawing.Point(216, 380);
-            this.btnScorePanel.Margin = new System.Windows.Forms.Padding(10);
-            this.btnScorePanel.Name = "btnScorePanel";
-            this.btnScorePanel.Size = new System.Drawing.Size(314, 50);
-            this.btnScorePanel.TabIndex = 171;
-            this.btnScorePanel.Text = "Score Panel";
-            this.btnScorePanel.UseVisualStyleBackColor = false;
-            this.btnScorePanel.Click += new System.EventHandler(this.btnScorePanel_Click);
-            // 
-            // btnResetSolarPanelPosistion
-            // 
-            this.btnResetSolarPanelPosistion.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.btnResetSolarPanelPosistion.BackColor = System.Drawing.SystemColors.Control;
-            this.btnResetSolarPanelPosistion.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnResetSolarPanelPosistion.Location = new System.Drawing.Point(440, 321);
-            this.btnResetSolarPanelPosistion.Margin = new System.Windows.Forms.Padding(10);
-            this.btnResetSolarPanelPosistion.Name = "btnResetSolarPanelPosistion";
-            this.btnResetSolarPanelPosistion.Size = new System.Drawing.Size(314, 39);
-            this.btnResetSolarPanelPosistion.TabIndex = 172;
-            this.btnResetSolarPanelPosistion.Text = "Reset Solar Panel Posistion";
-            this.btnResetSolarPanelPosistion.UseVisualStyleBackColor = false;
-            this.btnResetSolarPanelPosistion.Click += new System.EventHandler(this.btnResetSolarPanelPosistion_Click);
-            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1177, 637);
-            this.Controls.Add(this.btnScorePanel);
-            this.Controls.Add(this.btnStopScoringPanel);
-            this.Controls.Add(this.btnResetSolarPanelPosistion);
             this.Controls.Add(this.btnChampionshipRoundNext);
             this.Controls.Add(this.btnChampionshipRoundPrevious);
             this.Controls.Add(this.lblChampionshipRounds);
-            this.Controls.Add(this.btnHomePanel);
             this.Controls.Add(this.btnTournamentNext);
             this.Controls.Add(this.btnTournamentPrev);
             this.Controls.Add(this.lblTournamentName);
@@ -894,14 +814,8 @@
         public System.Windows.Forms.Button btnTournamentNext;
         public System.Windows.Forms.Button btnTournamentPrev;
         public System.Windows.Forms.Label lblTournamentName;
-        public System.Windows.Forms.Button btnHomePanel;
-        private System.Windows.Forms.Timer solarTimer;
-        private System.Windows.Forms.Timer sunChangeTimer;
         public System.Windows.Forms.Label lblChampionshipRounds;
         public System.Windows.Forms.Button btnChampionshipRoundNext;
         public System.Windows.Forms.Button btnChampionshipRoundPrevious;
-        public System.Windows.Forms.Button btnStopScoringPanel;
-        public System.Windows.Forms.Button btnScorePanel;
-        public System.Windows.Forms.Button btnResetSolarPanelPosistion;
     }
 }

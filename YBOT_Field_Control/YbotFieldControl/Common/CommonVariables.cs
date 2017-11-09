@@ -38,6 +38,7 @@ namespace YbotFieldControl
         autonomous,
         mantonomous,
         manual,
+        speed,
         end,
         off,
         debug,
@@ -55,7 +56,7 @@ namespace YbotFieldControl
         public string gameMode;     //Node's game mode status
         public string lightMode;    //Node's light mode 
         public byte byte6;          //Misc Information sent from Node
-        public byte byte7;        //Misc Information sent from Node
+        public byte byte7;          //Misc Information sent from Node
         public bool scored;         //Flag true if scored, false if not
         //Network Testing Variables
         public int fromPC;          //Number of messages received from pc to command node
@@ -65,10 +66,7 @@ namespace YbotFieldControl
         public int nodeMessagesSent;
         public int nodeMessagesReceived;
 
-        //Current year's Variables
-        public bool tested;
-        public bool deviceCycled;
-        public bool alarmState;
+
     }
 
     public class CommonVariables
@@ -93,7 +91,6 @@ namespace YbotFieldControl
 					return Path.Combine (Environment.GetEnvironmentVariable ("HOME"), "Desktop/YBOT Field Files/");
 				} 
 
-				Console.WriteLine ("Using windows version");
 				return Environment.ExpandEnvironmentVariables (@"%USERPROFILE%\Desktop\YBOT Field Files\");
 			}
 		}
@@ -104,7 +101,6 @@ namespace YbotFieldControl
 					return Path.Combine (Environment.GetEnvironmentVariable ("HOME"), "Desktop/YBOT Field Files/Setup/");
 				}
 
-				Console.WriteLine ("Using windows version");
 				return Environment.ExpandEnvironmentVariables (@"%USERPROFILE%\Desktop\YBOT Field Files\Setup");
 			}
 		}

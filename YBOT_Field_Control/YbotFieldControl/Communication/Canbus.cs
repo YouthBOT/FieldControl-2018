@@ -311,14 +311,14 @@ namespace YbotFieldControl
         /// <param name="_state">on or off</param>
         public void SetOutput(int _nodeAddress, int _outputNum, State _state)
         {
-            this.newData = false;
+            newData = false;
             if (_state == State.on)
             {
-                this.Send(_nodeAddress + ",4," + _outputNum + ",1");
+                Send(_nodeAddress + ",4," + _outputNum + ",1");
             }
             else
             {
-                this.Send(_nodeAddress + ",4," + _outputNum + ",0");
+                Send(_nodeAddress + ",4," + _outputNum + ",0");
             }
         }
 
@@ -328,14 +328,16 @@ namespace YbotFieldControl
         /// <param name="team">red, green, both</param>
         /// <param name="autonomousState">true = automode, false = manual mode</param>
         /// <param name="transmitterState">true = controllers on, false = controllers off</param>
-        public void RobotTransmitters(int _nodeAddress, State _autoState, State _transmitterState)
-        {
-            if (_transmitterState == State.on)
-            {
-                if (_autoState == State.on) Send(_nodeAddress + ",3,1");
-                else this.Send(_nodeAddress + ",3,2");
+        public void RobotTransmitters(int _nodeAddress, State _autoState, State _transmitterState) {
+            if (_transmitterState == State.on) {
+                if (_autoState == State.on) {
+                    Send (_nodeAddress + ",3,1");
+                } else {
+                    Send (_nodeAddress + ",3,2");
+                }
+            } else {
+                Send (_nodeAddress + ",3,0");
             }
-            else this.Send(_nodeAddress + ",3,0");
         }
         #endregion
 

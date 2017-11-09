@@ -46,8 +46,7 @@ namespace YbotFieldControl
         /// </summary>
         /// <param name="_min">Start Mins</param>
         /// <param name="_sec">Start Secs</param>
-        public void countDownStart(int _min, int _sec)
-        {
+        public void CountDownStart(int _min, int _sec) {
             _GameClock = DateTime.Now + new TimeSpan(0, _min, _sec);
             _elapsedTime.Restart();
         }
@@ -56,16 +55,12 @@ namespace YbotFieldControl
         /// Count down timer update returns formated time
         /// </summary>
         /// <returns>Current Time</returns>
-        public string countDownStatus()
-        {
+        public string CountDownStatus() {
             TimeSpan sp = _GameClock - DateTime.Now;
-            if ((sp.Minutes <= 0) && (sp.Seconds <= 0))
-            {
+            if ((sp.Minutes <= 0) && (sp.Seconds <= 0)) {
                 _timesUp = true;
                 return ("0:00");
-            }
-            else
-            {
+            } else {
                 _timesUp = false;
                 return string.Format("{0}:{1:00}", sp.Minutes, sp.Seconds);
             }
@@ -77,11 +72,14 @@ namespace YbotFieldControl
         /// </summary>
         /// <param name="_totalsec">Number of secs</param>
         /// <returns>true = times up; false = time isn't up</returns>
-        public bool Timer(int _totalsec)
-        {
+        public bool CheckTimeElapsed(int _totalsec) {
             double _etime = _elapsedTime.Elapsed.TotalSeconds;
-            if (_etime >= _totalsec) return true;
-            else return false;
+
+            if (_etime >= _totalsec) {
+                return true;
+            }
+
+            return false;
         }
     }
 }

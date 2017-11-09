@@ -37,33 +37,38 @@ namespace YbotFieldControl
 
         private string timeOfDay = DateTime.Now.ToString("HH_mm_ss"); //Time of day stamp
 
-        public Team red = new Team("red");            //New team 
-        public Team green = new Team("green");        //New team
+        public Team red = new Team("red");            //Red team 
+        public Team green = new Team("green");        //Green team
 
         public int autoModeTime = 30;   //Autonomous Mode time in secs
-        public int manAutoTime = 20;    //Mantonomous Mode start time
-        public int midModeTime = 120;   //Mid Mode time + automode time
+        public int manAutoTime = 0;    //Mantonomous Mode start time
+        public int midModeTime = 90;   //Mid Mode time + automode time
 
         //Game flags
         public GameModes gameMode = GameModes.off;
-        public bool practiceMode = false;   //True when game is in practice mode
 
         //------------------------------------------------------------------------------------------------\\
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
+        private Random randomNumber = new Random();   //Random Number
+        private int minimumRandomTime = 1;
+        private int maximumRandomTime = 7;
+        private double startingTimeElapsed = 0;
+        private bool speedRunActive = false;
+        private int[,] buttonTowers = {{1, 6}, {3, 8}, {5, 10}};
+        private int selectedTowerCombo = -1;
+        private int blockingTime = 10;
 
-        private Random rndNum = new Random();   //Random Number
-        private int sunTower = 0;               //Tower number to be the sun tower
-        public Team joint = new Team("joint");  //Joint team values
-        private bool solarAligned = false;
-        private int[] emergencyTowers = { 2, 4, 7, 9 };
-        private int[] eTowers = { 2, 4, 7, 9 };
-        private int alarmCouter = 3;
-        private int emergencyTower = 0;
-        private bool solarChanged = false;
-        private int solarPanel = 11;
-        private int value = 0;
-        private bool secondManSun = false;
-        private bool solarOverride = false;
+        private bool redSwitchThrown = false;
+        private bool greenSwitchThrown = false;
+        private bool tower1Pressed = false;
+        private bool tower5Pressed = false;
+        private bool tower6Pressed = false;
+        private bool tower10Pressed = false;
+
+        // <TODO> determine scores
+        public int autoSwitchThrowScore = 25;
+        public int autoButtonPressScore = 50;
+
     }
 }

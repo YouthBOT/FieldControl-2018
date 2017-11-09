@@ -50,24 +50,6 @@ namespace YbotFieldControl
         private void InitScore () {
             var green = game.green;
             var red = game.red;
-			var joint = game.joint;
-
-			var jointScore = joint.score.ToString();
-			tbJointScore.Text = jointScore;
-			tbRedScore.Text = jointScore;
-			tbGreenScore.Text = jointScore;
-
-			tbAutoCornersTested.Text = joint.autoTowerTested.ToString ();
-			tbAutoEmergencyCycled.Text = joint.autoEmergencyTowerCycled.ToString ();
-			tbAutoSolarScore.Text = joint.autoSolarPanelScore.ToString ();
-			tbManualSolar1Score.Text = joint.manSolarPanelScore1.ToString ();
-			tbManualSolar2Score.Text = joint.manSolarPanelScore2.ToString ();
-			tbManualEmergencyCycled.Text = joint.emergencyCleared.ToString ();
-			if (joint.emergencyCleared < minimumEmergencyCycled) {
-				cbEmergencyCycledPenalty.Text = emergencyCycledPenaltyPointValue.ToString();
-			} else {
-				cbEmergencyCycledPenalty.Text = "0";
-			}
 
             tbGreenPenalty.Text = green.penalty.ToString ();
             tbRedPenalty.Text = red.penalty.ToString ();
@@ -83,7 +65,7 @@ namespace YbotFieldControl
 			if (game.IsChampionshipMatch()) {
 				grRedFinalScore.Visible = false;
 				gbGreenFinalScore.Text = "Individual Final Score";
-				gbGreenFinalScore.ForeColor = System.Drawing.Color.SteelBlue;
+				gbGreenFinalScore.ForeColor = Color.SteelBlue;
 			}
 
             UpdateScore ();
@@ -164,24 +146,6 @@ namespace YbotFieldControl
             if (updateTeams) {
                 var green = game.green;
                 var red = game.red;
-				var joint = game.joint;
-
-				joint.autoTowerTested = autoCornersTested;
-				joint.autoEmergencyTowerCycled = autoEmergencyCycled;
-				joint.autoSolarPanelScore = autoSolar;
-
-				joint.manSolarPanelScore1 = manualSolar1;
-				joint.manSolarPanelScore2 = manualSolar2;
-				joint.emergencyCleared = manualEmergencyCycled;
-
-				joint.rockWeight = rockWeight;
-				joint.rockScore = rockScore;
-				joint.rocketPosition = rocketPositionMultiplier;
-				joint.rocketBonus = cbRocketLaunched.Checked;
-
-				joint.autoScore = autoScore;
-				joint.manScore = manualScore;
-				joint.score = jointScore;
 
                 green.autoTowerTested = autoCornersTested;
                 green.autoEmergencyTowerCycled = autoEmergencyCycled;

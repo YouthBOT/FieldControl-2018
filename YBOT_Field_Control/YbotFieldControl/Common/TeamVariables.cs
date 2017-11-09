@@ -241,7 +241,7 @@ namespace YbotFieldControl
         /// <summary>
         /// Resets variable
         /// </summary>
-        public void reset()
+        public void Reset()
         {
             this.score = 0;
             this.autoCount = 0;

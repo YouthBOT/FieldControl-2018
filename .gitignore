@@ -1,0 +1,10 @@
+bin/
+obj/
+.vs/
+*.pdb
+*.xml
+*.suo
+*.exe
+.directory
+sql-password.txt
+*.orig
