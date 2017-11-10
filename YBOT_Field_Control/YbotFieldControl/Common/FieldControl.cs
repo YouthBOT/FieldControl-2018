@@ -571,7 +571,57 @@ namespace YbotFieldControl
                     node[nodeID].byte6 = Convert.ToByte(parsedString[7]);
                     node[nodeID].byte7 = Convert.ToByte(parsedString[8]);
 
-                    // <TODO> determine switch inputs
+					// <TODO> determine switch inputs
+					switch (nodeID) {
+					case 1:
+						// at least one of the buttons is pressed
+						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
+							node[nodeID].scored = true;
+						} else {
+							node[nodeID].scored = false;
+						}
+						break;
+					case 3:
+						// switch is down
+						if (InputState(nodeID, 3)) {
+							node[nodeID].scored = true;
+						} else if (InputState (nodeID, 4)) {
+							node[nodeID].scored = false;
+						}
+						break;
+					case 5:
+						// at least one of the buttons is pressed
+						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
+							node[nodeID].scored = true;
+						} else {
+							node[nodeID].scored = false;
+						}
+						break;
+					case 6:
+						// at least one of the buttons is pressed
+						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
+							node[nodeID].scored = true;
+						} else {
+							node[nodeID].scored = false;
+						}
+						break;
+					case 8:
+						// switch is down
+						if (InputState(nodeID, 3)) {
+							node[nodeID].scored = true;
+						} else if (InputState (nodeID, 4)) {
+							node[nodeID].scored = false;
+						}
+						break;
+					case 10:
+						// at least one of the buttons is pressed
+						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
+							node[nodeID].scored = true;
+						} else {
+							node[nodeID].scored = false;
+						}
+						break;
+					}
                 }
             } catch (Exception ex) {
                 logWrite ("Update Node Failed - " + ex);
@@ -653,9 +703,9 @@ namespace YbotFieldControl
                 node[nd.id].outputStatus = 0;
                 node[nd.id].byte6 = 0;
                 node[nd.id].byte7 = 0;
-                node[nd.id].scored = false;
 
-                if (!selective) {             
+                if (!selective) {
+                    node[nd.id].scored = false;
                     node[nd.id].gameMode = "off";
                 }
             }

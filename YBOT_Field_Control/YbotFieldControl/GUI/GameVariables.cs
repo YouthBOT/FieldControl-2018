@@ -51,24 +51,28 @@ namespace YbotFieldControl
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
         private Random randomNumber = new Random();   //Random Number
-        private int minimumRandomTime = 1;
-        private int maximumRandomTime = 7;
         private double startingTimeElapsed = 0;
-        private bool speedRunActive = false;
-        private int[,] buttonTowers = {{1, 6}, {3, 8}, {5, 10}};
+        private const int TOWER_COMBO_LENGTH = 2;
+        private readonly int[,] BUTTON_TOWERS = {{1, 6}, {5, 10}};
         private int selectedTowerCombo = -1;
-        private int blockingTime = 10;
+        private const int BLOCKING_TIME = 10;
 
-        private bool redSwitchThrown = false;
-        private bool greenSwitchThrown = false;
-        private bool tower1Pressed = false;
-        private bool tower5Pressed = false;
-        private bool tower6Pressed = false;
-        private bool tower10Pressed = false;
+        private bool autoRedSwitchTurnedOff = false;
+        private bool autoGreenSwitchTurnedOff = false;
+        private bool autoTower1Pressed = false;
+        private bool autoTower5Pressed = false;
+        private bool autoTower6Pressed = false;
+        private bool autoTower10Pressed = false;
+        private bool speedRedSwitchTurnedOn = false;
+        private bool speedGreenSwitchTurnedOn = false;
+        private bool redSwitchTurnedOn = false;
+        private bool greenSwitchTurnedOn = false;
 
         // <TODO> determine scores
-        public int autoSwitchThrowScore = 25;
-        public int autoButtonPressScore = 50;
-
+        public const int AUTO_SWITCH_TURNED_OFF_SCORE = 75;
+        public const int AUTO_RIGHT_BUTTON_PRESSED_SCORE = 50;
+        public const int AUTO_LEFT_BUTTON_PRESSED_SCORE = 25;
+        public const int SPEED_BUTTON_PRESSED_SCORE = 10;
+        public const int SPEED_SWITCH_TURNED_ON_SCORE = 50;
     }
 }

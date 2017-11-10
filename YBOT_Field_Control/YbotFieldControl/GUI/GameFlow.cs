@@ -10,18 +10,6 @@ namespace YbotFieldControl
 {
     public partial class GameControl
     {
-        //Initiate game class
-        public void Begin () {
-            red.Reset ();                   //Reset Red variables
-            green.Reset ();                 //Reset Green variables
-
-            //Switch Game Mode to Reset Field
-            gameMode = fc.ChangeGameMode(GameModes.reset);
-
-            //Clear all the nodes' information
-            fc.ClearNodeState();
-        }
-
         /// <summary>
         /// Start a new game
         /// </summary>
@@ -34,16 +22,36 @@ namespace YbotFieldControl
         /// </summary>
         public void GameStartUp(GameModes mode) {
             // Reset variables and flags    
-            Begin ();  
-                    
+            red.Reset ();                   //Reset Red variables
+            green.Reset ();                 //Reset Green variables
+
+            // Reset game varibles
+            autoRedSwitchTurnedOff = false;
+            autoGreenSwitchTurnedOff = false;
+            autoTower1Pressed = false;
+            autoTower5Pressed = false;
+            autoTower6Pressed = false;
+            autoTower10Pressed = false;
+            speedRedSwitchTurnedOn = false;
+            speedGreenSwitchTurnedOn = false;
+            redSwitchTurnedOn = false;
+            greenSwitchTurnedOn = false;
+
+            //Switch Game Mode to Reset Field
+            gameMode = fc.ChangeGameMode (GameModes.reset);
+            Thread.Sleep (200);
+
+            //Clear all the nodes' information
+            fc.ClearNodeState ();
+
             // Set game field to ready
             gameMode = fc.ChangeGameMode(GameModes.ready);
             Thread.Sleep(200);
 
             // Set to mode and start game
             gameMode = fc.ChangeGameMode (mode);
-            fc.RobotTransmitters ("both", State.on, State.on);
-            GameLog("Game Started");
+
+            GameLog ("Game Started");
         }
 
         /// <summary>
@@ -62,9 +70,11 @@ namespace YbotFieldControl
             fc.AllFieldLights (LightColor.off, State.off);
             // Turn the robots off
             fc.RobotTransmitters ("both", State.off, State.off);
-
-            // <TODO> Turn off button lights
-            // <TODO> Turn off Manual and Auto relays
+            // Turn off speed mode
+            for (int i = 0; i < TOWER_COMBO_LENGTH; ++i) {
+                fc.SendMessage (BUTTON_TOWERS[i, 0], "7,0,0");
+                fc.SendMessage (BUTTON_TOWERS[i, 1], "7,0,0");
+            }
 
             //Record to logs
             GameLog ("Game End");
@@ -74,7 +84,7 @@ namespace YbotFieldControl
         /// Main Game control : enters and exits game modes
         /// </summary>
         public void MainGame() {
-            if (gameMode == GameModes.autonomous || gameMode == GameModes.mantonomous) {
+            if (gameMode == GameModes.autonomous) {
                 // Switching to auto mode
                 if (fc.switchMode) {
                     fc.switchMode = false;
@@ -83,12 +93,8 @@ namespace YbotFieldControl
                     fc.RingBell ();
                     Thread.Sleep (200);
 
-                    for (int i = 0; i < 3; ++i) {
-                        fc.Light (buttonTowers[i, 0], LightColor.blue);
-                        fc.Light (buttonTowers[i, 1], LightColor.blue);
-                    }
-
-                    // <TODO> light up buttons
+                    // Turn robots on in auto
+                    fc.RobotTransmitters ("both", State.on, State.on);
 
                     GameLog ("Start Auto Mode");
                 }
@@ -103,9 +109,14 @@ namespace YbotFieldControl
                     fc.RingBell ();
                     Thread.Sleep (200);
 
-                    // <TODO> determine what happens with the lights during manual
-                    // Turn all the lights off
-                    fc.AllFieldLights (LightColor.off, State.off);
+                    // Turn robots on in manaul
+                    fc.RobotTransmitters ("both", State.off, State.on);
+
+                    // Turn off speed mode
+                    for (int i = 0; i < TOWER_COMBO_LENGTH; ++i) {
+                        fc.SendMessage (BUTTON_TOWERS[i, 0], "7,0,0");
+                        fc.SendMessage (BUTTON_TOWERS[i, 1], "7,0,0");
+                    }
 
                     GameLog ("Auto Mode Over, Start Manual Mode");      //Update Log
                 }
@@ -116,14 +127,40 @@ namespace YbotFieldControl
                 if (fc.switchMode) {
                     fc.switchMode = false;
 
-                    fc.RingBell ();                 //Ring bell
+                    //Ring bell
+                    fc.RingBell ();                 
                     Thread.Sleep (200);
 
-                    // get the starting elapsed time for the speed runs
+                    // Turn robots on in manaul
+                    fc.RobotTransmitters ("both", State.off, State.on);
+
+                    // green switch is in the up position
+                    if (!fc.node[3].scored) {
+                        greenSwitchTurnedOn = true;
+                    }
+
+                    // red switch is in the up position
+                    if (!fc.node[8].scored) {
+                        redSwitchTurnedOn = true;
+                    }
+
+                    // Send speed mode to button towers
+                    for (int i = 0; i < TOWER_COMBO_LENGTH; ++i) {
+						fc.SendMessage(BUTTON_TOWERS[i, 0], "7,0,1");
+						fc.SendMessage(BUTTON_TOWERS[i, 1], "7,0,1");
+					}
+                   
+                    // Pick a random tower combo
+                    selectedTowerCombo = randomNumber.Next (0, TOWER_COMBO_LENGTH);
+                    GameLog (string.Format ("Selecting speed towers {0} and {1}",
+                        BUTTON_TOWERS[selectedTowerCombo, 0],
+                        BUTTON_TOWERS[selectedTowerCombo, 1]));
+                    // Select those towers
+                    fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 0], "7,1,1");
+					fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 1], "7,1,1");
+
+                    // Get the starting elapsed time for the speed runs
                     startingTimeElapsed = time.elapsedTime.Elapsed.TotalSeconds;
-                    selectedTowerCombo = randomNumber.Next (0, 2);
-                    fc.Light (buttonTowers[selectedTowerCombo, 0], LightColor.green);
-                    fc.Light (buttonTowers[selectedTowerCombo, 1], LightColor.red);
 
                     GameLog ("Manual Mode Over, Start Speed Mode");
                 }
@@ -133,47 +170,36 @@ namespace YbotFieldControl
         }
 
         public void AutoMode() {
-            // green throw the switch
-            if (fc.node[3].scored && !greenSwitchThrown) {
-                greenSwitchThrown = true;
-                fc.Light (3, LightColor.green);
-                green.score += autoSwitchThrowScore;
+            // green turned the switch off
+            if (fc.node[3].scored && !autoGreenSwitchTurnedOff) {
+                autoGreenSwitchTurnedOff = true;
+                green.score += AUTO_SWITCH_TURNED_OFF_SCORE;
             }
 
-            // red throw the switch
-            if (fc.node[8].scored && !redSwitchThrown) {
-                redSwitchThrown = true;
-                fc.Light (3, LightColor.red);
-                red.score += autoSwitchThrowScore;
+            // red turned the switch off
+            if (fc.node[8].scored && !autoRedSwitchTurnedOff) {
+				autoRedSwitchTurnedOff = true;
+                red.score += AUTO_SWITCH_TURNED_OFF_SCORE;
             }
 
-            // <TODO> possible don't need the conditional for the switch
-            if (greenSwitchThrown) {
-                if (fc.node[1].scored && !tower1Pressed) {
-                    tower1Pressed = true;
-                    fc.Light (1, LightColor.green);
-                    green.score += autoButtonPressScore;
-                }
-
-                if (fc.node[5].scored && !tower5Pressed) {
-                    tower5Pressed = true;
-                    fc.Light (5, LightColor.green);
-                    green.score += autoButtonPressScore;
-                }
+            if (fc.node[1].scored && !autoTower1Pressed) {
+                autoTower1Pressed = true;
+                green.score += AUTO_LEFT_BUTTON_PRESSED_SCORE;
             }
 
-            if (redSwitchThrown) {
-                if (fc.node[6].scored && !tower6Pressed) {
-                    tower6Pressed = true;
-                    fc.Light (6, LightColor.red);
-                    red.score += autoButtonPressScore;
-                }
+            if (fc.node[5].scored && !autoTower5Pressed) {
+                autoTower5Pressed = true;
+                green.score += AUTO_RIGHT_BUTTON_PRESSED_SCORE;
+            }
 
-                if (fc.node[10].scored && !tower10Pressed) {
-                    tower10Pressed = true;
-                    fc.Light (10, LightColor.red);
-                    red.score += autoButtonPressScore;
-                }
+            if (fc.node[6].scored && !autoTower6Pressed) {
+                autoTower6Pressed = true;
+                green.score += AUTO_LEFT_BUTTON_PRESSED_SCORE;
+            }
+
+            if (fc.node[10].scored && !autoTower10Pressed) {
+                autoTower10Pressed = true;
+                green.score += AUTO_RIGHT_BUTTON_PRESSED_SCORE;
             }
         }
 
@@ -182,20 +208,80 @@ namespace YbotFieldControl
         }
 
         public void SpeedMode() {
-  
-            if (time.elapsedTime.Elapsed.TotalSeconds - startingTimeElapsed < blockingTime) {
-
-            } else {
-                fc.Light (buttonTowers[selectedTowerCombo, 0], LightColor.off);
-                fc.Light (buttonTowers[selectedTowerCombo, 1], LightColor.off);
-                startingTimeElapsed = time.elapsedTime.Elapsed.TotalSeconds;
-                selectedTowerCombo = randomNumber.Next (0, 2);
-                fc.Light (buttonTowers[selectedTowerCombo, 0], LightColor.green);
-                fc.Light (buttonTowers[selectedTowerCombo, 1], LightColor.red);
+            // node 3 is not scored when the switch is in the up direction
+            if (!fc.node[3].scored && !greenSwitchTurnedOn) {
+                speedGreenSwitchTurnedOn = true;
+                greenSwitchTurnedOn = true;
+                green.score += SPEED_SWITCH_TURNED_ON_SCORE;
+            // node 3 is scored when the switch is in the down direction
+            } else if (fc.node[3].scored && greenSwitchTurnedOn) {
+                // switch was turned on previously
+                if (speedGreenSwitchTurnedOn) {
+                    // subtract that score
+                    green.score -= SPEED_SWITCH_TURNED_ON_SCORE;
+                }
+                speedGreenSwitchTurnedOn = false;
+                greenSwitchTurnedOn = false;
             }
 
+            // node 8 is not scored when the switch is in the up direction
+            if (!fc.node[8].scored && !redSwitchTurnedOn) {
+                speedRedSwitchTurnedOn = true;
+                redSwitchTurnedOn = true;
+                red.score += SPEED_SWITCH_TURNED_ON_SCORE;
+            // node 8 is scored when the switch is in the down direction
+            } else if (fc.node[8].scored && redSwitchTurnedOn) {
+                // switch was turned on previously
+                if (speedRedSwitchTurnedOn) {
+                    // subtract that score
+                    red.score -= SPEED_SWITCH_TURNED_ON_SCORE;
+                }
+                speedRedSwitchTurnedOn = false;
+                redSwitchTurnedOn = false;
+            }
 
+            // if time is still under the blocking time 
+            if (time.elapsedTime.Elapsed.TotalSeconds - startingTimeElapsed < BLOCKING_TIME) {
+                bool teamScored = false;
+                // green pressed the button
+				if (fc.node[BUTTON_TOWERS[selectedTowerCombo, 0]].scored && !greenSwitchTurnedOn) {
+                    green.score += SPEED_BUTTON_PRESSED_SCORE;
+                    teamScored = true;
+                // red pressed the button
+                } else if (fc.node[BUTTON_TOWERS[selectedTowerCombo, 1]].scored && !redSwitchTurnedOn) {
+                    red.score += SPEED_BUTTON_PRESSED_SCORE;
+                    teamScored = true;
+                }
 
+                // atleast one of the teams pressed a button, select a new tower combo
+                if (teamScored) {
+                    SelectSpeedTower ();
+                }
+            } else {
+                SelectSpeedTower ();
+            }
+        }
+
+        private void SelectSpeedTower () {
+            // Deselect towers
+            fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 0], "7,0,1");
+            fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 1], "7,0,1");
+
+            // Pick new tower combo
+            selectedTowerCombo = randomNumber.Next (0, TOWER_COMBO_LENGTH);
+            GameLog (string.Format ("Selecting speed towers {0} and {1}",
+                BUTTON_TOWERS[selectedTowerCombo, 0],
+                BUTTON_TOWERS[selectedTowerCombo, 1]));
+            // Select towers
+            if (!greenSwitchTurnedOn) {
+                fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 0], "7,1,1");
+            }
+            if (!redSwitchTurnedOn) {
+                fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 1], "7,1,1");
+            }
+
+            // Restart time
+            startingTimeElapsed = time.elapsedTime.Elapsed.TotalSeconds;
         }
 
         /// <summary>
@@ -207,6 +293,7 @@ namespace YbotFieldControl
             DateTime now = DateTime.Now;
             string time = now.TimeOfDay.ToString();
             string s = string.Format("{0} : {1}", time, text);
+            Console.WriteLine (s);
             logBuilder.AppendLine(s);
         }
 

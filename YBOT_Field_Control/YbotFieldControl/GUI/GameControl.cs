@@ -330,6 +330,7 @@ namespace YbotFieldControl
             GD.lblGameClock.ForeColor = Color.Blue;
 
             GameStartUp();
+            Thread.Sleep (200);
 
             autoModeTime = 30;
             manAutoTime = 0;
@@ -353,45 +354,64 @@ namespace YbotFieldControl
             LogGame ();
         }
 
-        private void btnPracticeMode_Click(object sender, EventArgs e) {
-            DisableGameButtons();
-            btnStop.BackColor = DefaultBackColor;
-            btnPracticeMode.BackColor = Color.LimeGreen;
-            ClearDisplay();
-            GameStartUp(GameModes.debug);
-            Thread.Sleep(200);
-            time.elapsedTime.Restart();
-            time.timesUp = false;
-            practiceTimer.Start();
-            MainGame();
-        }
-
         private void btnAutoMode_Click(object sender, EventArgs e) {
             DisableGameButtons();
-            btnStop.BackColor = DefaultBackColor;
-            btnAutoMode.BackColor = Color.LimeGreen;
             ClearDisplay();
+
             GameStartUp(GameModes.autonomous);
             Thread.Sleep(200);
-            GameLog("Auto Mode Started");
+            GameLog ("Auto Mode Started");
+
             time.elapsedTime.Restart();
             time.timesUp = false;
             practiceTimer.Start();
+
             MainGame();
         }
 
         private void btnManualMode_Click(object sender, EventArgs e) {
             DisableGameButtons();
-            btnStop.BackColor = DefaultBackColor;
-            btnManualMode.BackColor = Color.LimeGreen;
             ClearDisplay();
-            GameStartUp(GameModes.manual);
+
+            GameStartUp (GameModes.manual);
             Thread.Sleep(200);
-            GameLog("Middle Mode Started");
+            GameLog("Manual Mode Started");
+
             time.elapsedTime.Restart();
             time.timesUp = false;
             practiceTimer.Start();
+
             MainGame();
+        }
+
+        private void btnSpeedMode_Click (object sender, EventArgs e) {
+            DisableGameButtons ();
+            ClearDisplay ();
+
+            GameStartUp (GameModes.speed);
+            Thread.Sleep (200);
+            GameLog ("Speed Mode Started");
+
+            time.elapsedTime.Restart ();
+            time.timesUp = false;
+            practiceTimer.Start ();
+
+            MainGame ();
+        }
+
+        private void btnPracticeMode_Click (object sender, EventArgs e) {
+            DisableGameButtons ();
+            ClearDisplay ();
+
+            GameStartUp (GameModes.debug);
+            Thread.Sleep (200);
+            GameLog ("Practice Mode Started");
+
+            time.elapsedTime.Restart ();
+            time.timesUp = false;
+            practiceTimer.Start ();
+
+            MainGame ();
         }
 
         private void btnTestMode_Click(object sender, EventArgs e) {
@@ -417,7 +437,7 @@ namespace YbotFieldControl
             ClearDisplay();
             GameStartUp();
             gameTimer.Start();
-            time.CountDownStart(0, 11);
+            time.CountDownStart(0, 20);
             time.timesUp = false;
             MainGame();
         }
@@ -519,20 +539,6 @@ namespace YbotFieldControl
         private void UpdateGame () {
             MainGame ();
             UpdateDisplays ();
-
-            /*
-            if (!red.autoMan && (fc.node[3].gameMode == GameModes.mantonomous.ToString())) {
-                red.autoMan = true;
-                btnRedMantonomous.BackColor = Color.Red;
-                btnRedMantonomous.ForeColor = Color.Black;
-            }
-
-            if (!green.autoMan && (fc.node[8].gameMode == GameModes.mantonomous.ToString())) {
-                green.autoMan = true;
-                btnGreenMantonomous.BackColor = Color.Lime;
-                btnGreenMantonomous.ForeColor = Color.Black;
-            }
-            */
         }
 
         // Not used this year
@@ -792,6 +798,7 @@ namespace YbotFieldControl
             btnStartGame.Enabled = false;
             btnAutoMode.Enabled = false;
             btnManualMode.Enabled = false;
+            btnSpeedMode.Enabled = false;
             btnPracticeMode.Enabled = false;
             btnTestMode.Enabled = false;
 
@@ -803,6 +810,7 @@ namespace YbotFieldControl
             btnStartGame.Enabled = true;
             btnAutoMode.Enabled = true;
             btnManualMode.Enabled = true;
+            btnSpeedMode.Enabled = true;
             btnPracticeMode.Enabled = true;
             btnTestMode.Enabled = true;
 
@@ -1032,6 +1040,7 @@ namespace YbotFieldControl
                 GameShutDown ();
                 gameMode = fc.ChangeGameMode (GameModes.end);
 
+                EnableGameButtons ();
                 lblGameClock.Text = "0:00";
                 GD.lblGameClock.Text = "0:00";
                 lblGameClock.ForeColor = Color.Black;
@@ -1064,7 +1073,7 @@ namespace YbotFieldControl
             else if (gameMode == GameModes.speed) {
 
             } else {
-                throw new Exception ("This is for testing purposes. This should never be reached");
+                Console.WriteLine ("Something went wrong with time keeping, please looking into this");
             }
         }
 
@@ -1093,7 +1102,7 @@ namespace YbotFieldControl
 
                 //Thread.Sleep(100);
                 gameTimer.Stop();
-                this.TestMode();
+                TestMode();
             }
         }
         #endregion
@@ -1111,14 +1120,10 @@ namespace YbotFieldControl
                 btnGreenMantonomous.BackColor = Color.Lime;
                 btnGreenMantonomous.ForeColor = Color.Black;
     
-                this.green.autoMan = true;
-                this.GameLog("Green ManTonomous");
+                green.autoMan = true;
+                GameLog("Green ManTonomous");
 
-                //for (int i = 6; i <= 10; i++)
-                //{
-                //    this.fc.ChangeGameMode(i, GameModes.mantonomous);
-                //}
-                this.fc.RobotTransmitters("green", State.off, State.on);
+                fc.RobotTransmitters("green", State.off, State.on);
             }
         }
 
@@ -1129,20 +1134,12 @@ namespace YbotFieldControl
                 btnRedMantonomous.BackColor = Color.Red;
                 btnRedMantonomous.ForeColor = Color.Black;
 
-                this.red.autoMan = true;
-                this.GameLog("Red ManTonomous");
+                red.autoMan = true;
+                GameLog("Red ManTonomous");
 
-                //for (int i = 1; i <= 5; i++)
-                //{
-                //    this.fc.ChangeGameMode(i, GameModes.mantonomous);
-                //}
-                this.fc.RobotTransmitters("red", State.off, State.on);
+                fc.RobotTransmitters("red", State.off, State.on);
             }
         }
-
-        //string str = ("7,1,3,");
-        //fc.SendMessage(solarPanel, str);
-     
     }
 
     //Vertical Progress Bar 

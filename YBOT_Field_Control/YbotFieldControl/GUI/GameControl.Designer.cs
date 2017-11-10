@@ -77,6 +77,7 @@
             this.lblChampionshipRounds = new System.Windows.Forms.Label();
             this.btnChampionshipRoundNext = new System.Windows.Forms.Button();
             this.btnChampionshipRoundPrevious = new System.Windows.Forms.Button();
+            this.btnSpeedMode = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -263,7 +264,8 @@
             // 
             this.btnGameDisplay.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnGameDisplay.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnGameDisplay.Location = new System.Drawing.Point(308, 17);
+            this.btnGameDisplay.Location = new System.Drawing.Point(279, 17);
+            this.btnGameDisplay.Margin = new System.Windows.Forms.Padding(10);
             this.btnGameDisplay.Name = "btnGameDisplay";
             this.btnGameDisplay.Size = new System.Drawing.Size(100, 75);
             this.btnGameDisplay.TabIndex = 128;
@@ -343,7 +345,7 @@
             // 
             this.btnStop.BackColor = System.Drawing.Color.Red;
             this.btnStop.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnStop.Location = new System.Drawing.Point(30, 17);
+            this.btnStop.Location = new System.Drawing.Point(13, 18);
             this.btnStop.Margin = new System.Windows.Forms.Padding(10);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(100, 75);
@@ -380,8 +382,8 @@
             // 
             this.btnStartGame.BackColor = System.Drawing.SystemColors.Control;
             this.btnStartGame.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnStartGame.Location = new System.Drawing.Point(150, 17);
-            this.btnStartGame.Margin = new System.Windows.Forms.Padding(10);
+            this.btnStartGame.Location = new System.Drawing.Point(128, 17);
+            this.btnStartGame.Margin = new System.Windows.Forms.Padding(5);
             this.btnStartGame.Name = "btnStartGame";
             this.btnStartGame.Size = new System.Drawing.Size(100, 75);
             this.btnStartGame.TabIndex = 60;
@@ -392,7 +394,7 @@
             // btnAutoMode
             // 
             this.btnAutoMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnAutoMode.Location = new System.Drawing.Point(544, 17);
+            this.btnAutoMode.Location = new System.Drawing.Point(546, 17);
             this.btnAutoMode.Margin = new System.Windows.Forms.Padding(10);
             this.btnAutoMode.Name = "btnAutoMode";
             this.btnAutoMode.Size = new System.Drawing.Size(100, 75);
@@ -404,12 +406,12 @@
             // btnPracticeMode
             // 
             this.btnPracticeMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnPracticeMode.Location = new System.Drawing.Point(784, 17);
+            this.btnPracticeMode.Location = new System.Drawing.Point(906, 17);
             this.btnPracticeMode.Margin = new System.Windows.Forms.Padding(10);
             this.btnPracticeMode.Name = "btnPracticeMode";
             this.btnPracticeMode.Size = new System.Drawing.Size(100, 75);
             this.btnPracticeMode.TabIndex = 64;
-            this.btnPracticeMode.Text = "Practice Mode";
+            this.btnPracticeMode.Text = "Debug Mode";
             this.btnPracticeMode.UseVisualStyleBackColor = true;
             this.btnPracticeMode.Click += new System.EventHandler(this.btnPracticeMode_Click);
             // 
@@ -431,7 +433,7 @@
             // btnManualMode
             // 
             this.btnManualMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnManualMode.Location = new System.Drawing.Point(664, 17);
+            this.btnManualMode.Location = new System.Drawing.Point(666, 17);
             this.btnManualMode.Margin = new System.Windows.Forms.Padding(10);
             this.btnManualMode.Name = "btnManualMode";
             this.btnManualMode.Size = new System.Drawing.Size(100, 75);
@@ -445,7 +447,7 @@
             this.btnScoreGame.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.btnScoreGame.Cursor = System.Windows.Forms.Cursors.Default;
             this.btnScoreGame.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnScoreGame.Location = new System.Drawing.Point(424, 17);
+            this.btnScoreGame.Location = new System.Drawing.Point(399, 17);
             this.btnScoreGame.Margin = new System.Windows.Forms.Padding(10);
             this.btnScoreGame.Name = "btnScoreGame";
             this.btnScoreGame.Size = new System.Drawing.Size(100, 75);
@@ -567,6 +569,7 @@
             // grbGameMode
             // 
             this.grbGameMode.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.grbGameMode.Controls.Add(this.btnSpeedMode);
             this.grbGameMode.Controls.Add(this.btnTestMode);
             this.grbGameMode.Controls.Add(this.btnGameDisplay);
             this.grbGameMode.Controls.Add(this.btnStartGame);
@@ -576,10 +579,10 @@
             this.grbGameMode.Controls.Add(this.btnAutoMode);
             this.grbGameMode.Controls.Add(this.btnPracticeMode);
             this.grbGameMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.grbGameMode.Location = new System.Drawing.Point(93, 4);
+            this.grbGameMode.Location = new System.Drawing.Point(19, 4);
             this.grbGameMode.Margin = new System.Windows.Forms.Padding(10);
             this.grbGameMode.Name = "grbGameMode";
-            this.grbGameMode.Size = new System.Drawing.Size(1013, 105);
+            this.grbGameMode.Size = new System.Drawing.Size(1139, 105);
             this.grbGameMode.TabIndex = 148;
             this.grbGameMode.TabStop = false;
             this.grbGameMode.Text = "Game Modes";
@@ -587,7 +590,7 @@
             // btnTestMode
             // 
             this.btnTestMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnTestMode.Location = new System.Drawing.Point(900, 17);
+            this.btnTestMode.Location = new System.Drawing.Point(1026, 17);
             this.btnTestMode.Margin = new System.Windows.Forms.Padding(10);
             this.btnTestMode.Name = "btnTestMode";
             this.btnTestMode.Size = new System.Drawing.Size(100, 75);
@@ -722,6 +725,18 @@
             this.btnChampionshipRoundPrevious.Visible = false;
             this.btnChampionshipRoundPrevious.Click += new System.EventHandler(this.btnChampionshipRound_Click);
             // 
+            // btnSpeedMode
+            // 
+            this.btnSpeedMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSpeedMode.Location = new System.Drawing.Point(786, 17);
+            this.btnSpeedMode.Margin = new System.Windows.Forms.Padding(10);
+            this.btnSpeedMode.Name = "btnSpeedMode";
+            this.btnSpeedMode.Size = new System.Drawing.Size(100, 75);
+            this.btnSpeedMode.TabIndex = 147;
+            this.btnSpeedMode.Text = "Speed Mode";
+            this.btnSpeedMode.UseVisualStyleBackColor = true;
+            this.btnSpeedMode.Click += new System.EventHandler(this.btnSpeedMode_Click);
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -817,5 +832,6 @@
         public System.Windows.Forms.Label lblChampionshipRounds;
         public System.Windows.Forms.Button btnChampionshipRoundNext;
         public System.Windows.Forms.Button btnChampionshipRoundPrevious;
+        private System.Windows.Forms.Button btnSpeedMode;
     }
 }
