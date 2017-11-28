@@ -52,8 +52,8 @@ namespace YbotFieldControl
         //------------------------------------------------------------------------------------------------\\
         private Random randomNumber = new Random();   //Random Number
         private double startingTimeElapsed = 0;
-        private const int TOWER_COMBO_LENGTH = 2;
-        private readonly int[,] BUTTON_TOWERS = {{1, 6}, {5, 10}};
+		private readonly int[,] BUTTON_TOWERS = {{1, 6}, {3, 8}, {5, 10}};
+		private const int TOWER_COMBO_LENGTH = 3;
         private int selectedTowerCombo = -1;
         private const int BLOCKING_TIME = 10;
 
