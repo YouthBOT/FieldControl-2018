@@ -75,7 +75,7 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 11, 10, 99, 99, 99, 99 };	//Green 10, Red 11
+uint8_t inputPins[6] = { 11, 10, 6, 5, 99, 99 };	//Green 10, Red 11
 //Output Pin number - Pin# of Output - 99 if not used
 uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
@@ -470,9 +470,8 @@ void gamePlayCanbus()
 		{
 			boolean button1 = inputStates[0];
 			boolean button2 = inputStates[1];
-			boolean switchUp = inputStates[2];
-			boolean switchDown = inputStates[3];
-
+			boolean switchUp = !inputStates[2];
+			boolean switchDown = !inputStates[3];
 
 			if (!complete)
 			{
@@ -482,7 +481,8 @@ void gamePlayCanbus()
 					{
 						report(0, commandNode);
 						towerSelected = false;
-						byte _color = nodeStatus[1];
+						//byte _color = nodeStatus[1];
+            byte _color = blue;
 						flashColor(_color, 0, 3, 0, stripLength);
 						solidColor(_color, 0, 0, stripLength);
 						complete = true;
@@ -494,7 +494,8 @@ void gamePlayCanbus()
 					{
 						report(0, commandNode);
 						towerSelected = false;
-						byte _color = nodeStatus[1];
+						//byte _color = nodeStatus[1];
+            byte _color = blue;
 						flashColor(_color, 0, 3, 0, stripLength);
 						solidColor(_color, 0, 0, stripLength);
 						complete = true;
