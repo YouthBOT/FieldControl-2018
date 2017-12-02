@@ -574,45 +574,10 @@ namespace YbotFieldControl
 					// <TODO> determine switch inputs
 					switch (nodeID) {
 					case 1:
-						// at least one of the buttons is pressed
-						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
-							node[nodeID].scored = true;
-						} else {
-							node[nodeID].scored = false;
-						}
-						break;
 					case 3:
-						// switch is down
-						if (!InputState(nodeID, 4)) {
-							node[nodeID].scored = true;
-						} else if (!InputState (nodeID, 3)) {
-							node[nodeID].scored = false;
-						}
-						break;
 					case 5:
-						// at least one of the buttons is pressed
-						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
-							node[nodeID].scored = true;
-						} else {
-							node[nodeID].scored = false;
-						}
-						break;
 					case 6:
-						// at least one of the buttons is pressed
-						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
-							node[nodeID].scored = true;
-						} else {
-							node[nodeID].scored = false;
-						}
-						break;
 					case 8:
-						// switch is down
-						if (!InputState(nodeID, 4)) {
-							node[nodeID].scored = true;
-						} else if (!InputState (nodeID, 3)) {
-							node[nodeID].scored = false;
-						}
-						break;
 					case 10:
 						// at least one of the buttons is pressed
 						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
@@ -620,6 +585,8 @@ namespace YbotFieldControl
 						} else {
 							node[nodeID].scored = false;
 						}
+						break;
+					default:
 						break;
 					}
                 }

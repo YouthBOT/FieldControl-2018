@@ -134,15 +134,9 @@ namespace YbotFieldControl
                     // Turn robots on in manaul
                     fc.RobotTransmitters ("both", State.off, State.on);
 
-                    // green switch is in the up position
-                    if (!fc.node[3].scored) {
-                        greenSwitchTurnedOn = true;
-                    }
-
-                    // red switch is in the up position
-                    if (!fc.node[8].scored) {
-                        redSwitchTurnedOn = true;
-                    }
+                    // switch inputs are inverted
+                    greenSwitchTurnedOn |= !fc.InputState(3, SWITCH_UP_INPUT);
+                    redSwitchTurnedOn |= !fc.InputState(8, SWITCH_UP_INPUT);
 
                     // Send speed mode to button towers
                     for (int i = 0; i < TOWER_COMBO_LENGTH; ++i) {
@@ -170,37 +164,83 @@ namespace YbotFieldControl
         }
 
         public void AutoMode() {
-            // green turned the switch off
-            if (fc.node[3].scored && !autoGreenSwitchTurnedOff) {
+			// green turned the switch offf
+			if (!fc.InputState(3, SWITCH_DOWN_INPUT) && !autoGreenSwitchTurnedOff) {
                 autoGreenSwitchTurnedOff = true;
                 green.score += AUTO_SWITCH_TURNED_OFF_SCORE;
             }
 
             // red turned the switch off
-            if (fc.node[8].scored && !autoRedSwitchTurnedOff) {
+            if (!fc.InputState(8, SWITCH_DOWN_INPUT) && !autoRedSwitchTurnedOff) {
 				autoRedSwitchTurnedOff = true;
                 red.score += AUTO_SWITCH_TURNED_OFF_SCORE;
             }
 
             if (fc.node[1].scored && !autoTower1Pressed) {
                 autoTower1Pressed = true;
-                green.score += AUTO_LEFT_BUTTON_PRESSED_SCORE;
+				if (!autoGreenPressedOne) {
+					autoGreenPressedOne = true;
+					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoGreenPressedTwo) {
+					autoGreenPressedTwo = true;
+					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				}
             }
 
-            if (fc.node[5].scored && !autoTower5Pressed) {
-                autoTower5Pressed = true;
-                green.score += AUTO_RIGHT_BUTTON_PRESSED_SCORE;
-            }
+            if (fc.node[3].scored && !autoTower3Pressed) {
+				autoTower3Pressed = true;
+				if (!autoGreenPressedOne) {
+					autoGreenPressedOne = true;
+					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoGreenPressedTwo) {
+					autoGreenPressedTwo = true;
+					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				}
+			}
 
-            if (fc.node[6].scored && !autoTower6Pressed) {
-                autoTower6Pressed = true;
-                green.score += AUTO_LEFT_BUTTON_PRESSED_SCORE;
-            }
+			if (fc.node[5].scored && !autoTower5Pressed) {
+				autoTower5Pressed = true;
+				if (!autoGreenPressedOne) {
+					autoGreenPressedOne = true;
+					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoGreenPressedTwo) {
+					autoGreenPressedTwo = true;
+					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				}
+			}
 
-            if (fc.node[10].scored && !autoTower10Pressed) {
-                autoTower10Pressed = true;
-                green.score += AUTO_RIGHT_BUTTON_PRESSED_SCORE;
-            }
+			if (fc.node[6].scored && !autoTower6Pressed) {
+				autoTower6Pressed = true;
+				if (!autoRedPressedOne) {
+					autoRedPressedOne = true;
+					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoRedPressedTwo) {
+					autoRedPressedTwo = true;
+					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				}
+			}
+
+			if (fc.node[8].scored && !autoTower8Pressed) {
+				autoTower8Pressed = true;
+				if (!autoRedPressedOne) {
+					autoRedPressedOne = true;
+					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoRedPressedTwo) {
+					autoRedPressedTwo = true;
+					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				}
+			}
+
+			if (fc.node[10].scored && !autoTower10Pressed) {
+				autoTower10Pressed = true;
+				if (!autoRedPressedOne) {
+					autoRedPressedOne = true;
+					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoRedPressedTwo) {
+					autoRedPressedTwo = true;
+					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				}
+			}
         }
 
         public void ManualMode() {
@@ -208,13 +248,11 @@ namespace YbotFieldControl
         }
 
         public void SpeedMode() {
-            // node 3 is not scored when the switch is in the up direction
-            if (!fc.node[3].scored && !greenSwitchTurnedOn) {
+            if (!fc.InputState(3, SWITCH_UP_INPUT) && !greenSwitchTurnedOn) {
                 speedGreenSwitchTurnedOn = true;
                 greenSwitchTurnedOn = true;
                 green.score += SPEED_SWITCH_TURNED_ON_SCORE;
-            // node 3 is scored when the switch is in the down direction
-            } else if (fc.node[3].scored && greenSwitchTurnedOn) {
+            } else if (!fc.InputState(3, SWITCH_DOWN_INPUT) && greenSwitchTurnedOn) {
                 // switch was turned on previously
                 if (speedGreenSwitchTurnedOn) {
                     // subtract that score
@@ -224,13 +262,11 @@ namespace YbotFieldControl
                 greenSwitchTurnedOn = false;
             }
 
-            // node 8 is not scored when the switch is in the up direction
-            if (!fc.node[8].scored && !redSwitchTurnedOn) {
+            if (!fc.InputState(8, SWITCH_UP_INPUT) && !redSwitchTurnedOn) {
                 speedRedSwitchTurnedOn = true;
                 redSwitchTurnedOn = true;
                 red.score += SPEED_SWITCH_TURNED_ON_SCORE;
-            // node 8 is scored when the switch is in the down direction
-            } else if (fc.node[8].scored && redSwitchTurnedOn) {
+            } else if (!fc.InputState(8, SWITCH_DOWN_INPUT) && redSwitchTurnedOn) {
                 // switch was turned on previously
                 if (speedRedSwitchTurnedOn) {
                     // subtract that score

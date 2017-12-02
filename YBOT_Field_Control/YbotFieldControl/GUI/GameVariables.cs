@@ -56,12 +56,20 @@ namespace YbotFieldControl
 		private const int TOWER_COMBO_LENGTH = 3;
         private int selectedTowerCombo = -1;
         private const int BLOCKING_TIME = 10;
+		private const int SWITCH_UP_INPUT = 3;
+		private const int SWITCH_DOWN_INPUT = 4;
 
         private bool autoRedSwitchTurnedOff = false;
         private bool autoGreenSwitchTurnedOff = false;
+		private bool autoGreenPressedOne = false;
+		private bool autoGreenPressedTwo = false;
+		private bool autoRedPressedOne = false;
+		private bool autoRedPressedTwo = false;
         private bool autoTower1Pressed = false;
+		private bool autoTower3Pressed = false;
         private bool autoTower5Pressed = false;
         private bool autoTower6Pressed = false;
+		private bool autoTower8Pressed = false;
         private bool autoTower10Pressed = false;
         private bool speedRedSwitchTurnedOn = false;
         private bool speedGreenSwitchTurnedOn = false;
@@ -70,8 +78,8 @@ namespace YbotFieldControl
 
         // <TODO> determine scores
         public const int AUTO_SWITCH_TURNED_OFF_SCORE = 75;
-        public const int AUTO_RIGHT_BUTTON_PRESSED_SCORE = 50;
-        public const int AUTO_LEFT_BUTTON_PRESSED_SCORE = 25;
+        public const int AUTO_FIRST_BUTTON_PRESSED_SCORE = 50;
+        public const int AUTO_SECOND_BUTTON_PRESSED_SCORE = 25;
         public const int SPEED_BUTTON_PRESSED_SCORE = 10;
         public const int SPEED_SWITCH_TURNED_ON_SCORE = 50;
     }

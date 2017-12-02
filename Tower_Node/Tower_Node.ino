@@ -81,8 +81,8 @@ uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
 uint8_t ledPin = 23;
 //Button State of the Filtered Digital Inputs - 0 = open; 1 = closed
-byte inputStates[6] = { 0, 0, 0, 0, 0, 0 };
-byte outputState[6] = { 0, 0, 0, 0, 0, 0 };
+uint8_t inputStates[6] = { 0, 0, 0, 0, 0, 0 };
+uint8_t outputState[6] = { 0, 0, 0, 0, 0, 0 };
 uint8_t autoPin = 5;
 uint8_t manPin = 6;
 uint8_t manTonPin = 4;
@@ -481,8 +481,7 @@ void gamePlayCanbus()
 					{
 						report(0, commandNode);
 						towerSelected = false;
-						//byte _color = nodeStatus[1];
-            byte _color = blue;
+						uint32_t _color = colorValue(nodeStatus[1]);
 						flashColor(_color, 0, 3, 0, stripLength);
 						solidColor(_color, 0, 0, stripLength);
 						complete = true;
@@ -494,8 +493,7 @@ void gamePlayCanbus()
 					{
 						report(0, commandNode);
 						towerSelected = false;
-						//byte _color = nodeStatus[1];
-            byte _color = blue;
+						uint32_t _color = colorValue(nodeStatus[1]);
 						flashColor(_color, 0, 3, 0, stripLength);
 						solidColor(_color, 0, 0, stripLength);
 						complete = true;
@@ -569,7 +567,7 @@ void gamePlayCanbus()
 						{
 							report(0, commandNode);
 							towerSelected = false;
-							byte _color = nodeStatus[1];
+							uint32_t _color = colorValue(nodeStatus[1]);
 							flashColor(_color, 0, 3, 0, stripLength);
 						}
 					}
