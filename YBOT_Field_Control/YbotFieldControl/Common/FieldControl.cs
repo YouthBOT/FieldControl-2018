@@ -583,9 +583,9 @@ namespace YbotFieldControl
 						break;
 					case 3:
 						// switch is down
-						if (InputState(nodeID, 3)) {
+						if (!InputState(nodeID, 4)) {
 							node[nodeID].scored = true;
-						} else if (InputState (nodeID, 4)) {
+						} else if (!InputState (nodeID, 3)) {
 							node[nodeID].scored = false;
 						}
 						break;
@@ -607,9 +607,9 @@ namespace YbotFieldControl
 						break;
 					case 8:
 						// switch is down
-						if (InputState(nodeID, 3)) {
+						if (!InputState(nodeID, 4)) {
 							node[nodeID].scored = true;
-						} else if (InputState (nodeID, 4)) {
+						} else if (!InputState (nodeID, 3)) {
 							node[nodeID].scored = false;
 						}
 						break;
