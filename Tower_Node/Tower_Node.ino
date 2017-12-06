@@ -32,6 +32,7 @@ uint32_t green = light.Color(0, brt, 0);
 uint32_t blue = light.Color(0, 0, brt);
 uint32_t white = light.Color(brt, brt, brt);
 uint32_t yellow = light.Color(brt, brt, 0);
+uint32_t purple = light.Color(brt, 0, brt);
 uint32_t off = light.Color(0, 0, 0);
 #pragma endregion
 
@@ -83,8 +84,8 @@ uint8_t ledPin = 23;
 //Button State of the Filtered Digital Inputs - 0 = open; 1 = closed
 uint8_t inputStates[6] = { 0, 0, 0, 0, 0, 0 };
 uint8_t outputState[6] = { 0, 0, 0, 0, 0, 0 };
-uint8_t autoPin = 5;
-uint8_t manPin = 6;
+uint8_t autoPin = 8;
+uint8_t manPin = 9;
 uint8_t manTonPin = 4;
 int manTonState = 1;
 
@@ -97,6 +98,7 @@ boolean towerSelected = false;		//If the tower is selected
 uint8_t selectedState = 0;			//Selected state of tower
 boolean gameModeChanged = true;		//If mode is changed
 boolean complete = false;			//If task is complete
+boolean switchTurnedOff = false;	//
 uint8_t function = 0;				//Function Type
 uint8_t functionMode = 0;			//Fuction Mode
 uint8_t gameMode = 8;				//Game Mode Value - starts in Debug mode
@@ -250,9 +252,6 @@ START_INIT:
 	delay(500);
 
 	solidColor(off, 0, 0, stripLength);	//Turn off light
-
-
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,6 +308,10 @@ void loop()
 			}
 		}
 	}
+
+	//hack because it seems like the arduino is unlatching the pullups
+	pinMode(inputPins[2], INPUT_PULLUP);
+	pinMode(inputPins[3], INPUT_PULLUP);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -409,10 +412,13 @@ void execute()
 		if (canIn[1] == 1)
 		{
 			towerSelected = true;
+			wipeColor(yellow, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
 		}
 		else
 		{
 			towerSelected = false;
+			solidColor(off, 0, 0, stripLength);
 		}
 
 		if (canIn[2] == 1)
@@ -440,6 +446,7 @@ void gamePlayCanbus()
 			wipeColor(off, 0, 1, 0, stripLength);
 			gameModeChanged = false;
 			complete = false;
+			switchTurnedOff = false;
 		}
 	}
 	else if (gameMode == 2)	//Start
@@ -450,10 +457,10 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			solidColor(blue, 0, 0, stripLength);
+			solidColor(yellow, 0, 0, stripLength);
 
 			gameModeChanged = false;
-
+			switchTurnedOff = false;
 			complete = false;
 
 			if ((nodeID == 3) || (nodeID == 8))
@@ -470,34 +477,40 @@ void gamePlayCanbus()
 		{
 			boolean button1 = inputStates[0];
 			boolean button2 = inputStates[1];
-			boolean switchUp = !inputStates[2];
+
 			boolean switchDown = !inputStates[3];
 
-			if (!complete)
+			if ((nodeID == 3) || (nodeID == 8))
 			{
-				if ((nodeID == 3) || (nodeID == 8))
+				if (!switchTurnedOff)
 				{
 					if (switchDown)
 					{
 						report(0, commandNode);
 						towerSelected = false;
-						uint32_t _color = colorValue(nodeStatus[1]);
-						flashColor(_color, 0, 3, 0, stripLength);
-						solidColor(_color, 0, 0, stripLength);
-						complete = true;
+						flashColor(blue, 0, 3, 0, stripLength);
+						solidColor(blue, 0, 0, stripLength);
+						switchTurnedOff = true;
 					}
 				}
-				else
+			}
+
+			if (!complete)
+			{
+				if (button1 || button2)
 				{
-					if (button1 || button2)
+					report(0, commandNode);
+					towerSelected = false;
+					flashColor(yellow, 0, 3, 0, stripLength);
+					if (switchTurnedOff)
 					{
-						report(0, commandNode);
-						towerSelected = false;
-						uint32_t _color = colorValue(nodeStatus[1]);
-						flashColor(_color, 0, 3, 0, stripLength);
-						solidColor(_color, 0, 0, stripLength);
-						complete = true;
+						solidColor(blue, 0, 0, stripLength);
 					}
+					else
+					{
+						solidColor(yellow, 0, 0, stripLength);
+					}
+					complete = true;
 				}
 			}
 		}
@@ -506,7 +519,6 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-
 			gameModeChanged = false;
 			complete = false;
 
@@ -533,51 +545,100 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
-			if ((nodeID == 3) || (nodeID == 8))
+			if ((nodeID == 3) || (nodeID == 8)) 
 			{
 				digitalWrite(autoPin, HIGH);
 				digitalWrite(manPin, HIGH);
+
+				updateInputs();
+				if ((nodeID == 3) || (nodeID == 8))
+				{
+					boolean switchDown = !inputStates[3];
+					boolean switchUp = !inputStates[2];
+
+					if (switchDown)
+					{
+						switchTurnedOff = true;
+					}
+					else 
+					{
+						switchTurnedOff = false;
+					}
+				}
 			}
+			
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
 			gameModeChanged = false;
 			complete = false;
+			speedMode = false;
 		}
 
-		if (!complete)
+		if (speedMode)
 		{
-			if (!speedMode)
+			if (towerSelected)
 			{
-				//alarmColor(yellow, 10, 1, 0, stripLength);
-				wipeColor(yellow, 20, 1, 0, stripLength);
+				wipeColor(yellow, 0, 1, 0, stripLength);
+				wipeColor(off, 0, 1, 0, stripLength);
 			}
 			else
 			{
+				solidColor(off, 0, 0, stripLength);
+			}
+
+			byte oldState = nodeStatus[4];
+			updateInputs();
+			if (oldState != nodeStatus[4])
+			{
 				if (towerSelected)
 				{
-					byte oldState = nodeStatus[4];
-					updateInputs();
+					boolean button1 = inputStates[1];
+					boolean button2 = inputStates[0];
 
-					if (oldState != nodeStatus[4])
+					if (button1 || button2)
 					{
-						boolean button1 = inputStates[1];
-						boolean button2 = inputStates[0];
+						report(0, commandNode);
+						towerSelected = false;
+						flashColor(yellow, 0, 3, 0, stripLength);
+						solidColor(off, 0, 0, stripLength);
+					}
+				}
+					
+				if ((nodeID == 3) || (nodeID == 8))
+				{
+					boolean switchDown = !inputStates[3];
+					boolean switchUp = !inputStates[2];
 
-						if (button1 || button2)
+					if (switchTurnedOff)
+					{
+						if (switchUp)
 						{
 							report(0, commandNode);
+							flashColor(blue, 0, 3, 0, stripLength);
+							solidColor(blue, 0, 0, stripLength);
+							switchTurnedOff = false;
 							towerSelected = false;
-							uint32_t _color = colorValue(nodeStatus[1]);
-							flashColor(_color, 0, 3, 0, stripLength);
+						}
+					} 
+					else 
+					{
+						if (switchDown)
+						{
+							report(0, commandNode);
+							flashColor(blue, 0, 3, 0, stripLength);
+							solidColor(blue, 0, 0, stripLength);
+							switchTurnedOff = true;
 						}
 					}
 				}
-				else
-				{
-					solidColor(off, 0, 0, stripLength);
-				}
 			}
 		}
+		else
+		{
+			solidColor(off, 0, 0, stripLength);
+		}
+
+
 	}
 	else if (gameMode == 6)	//End
 	{
@@ -621,8 +682,6 @@ void gamePlayCanbus()
 				digitalWrite(autoPin, HIGH);
 				digitalWrite(manPin, HIGH);
 			}
-
-
 		}
 
 		//if (towerSelected)
@@ -854,9 +913,14 @@ void gamePlaySpeedTest()
 				digitalWrite(autoPin, HIGH);
 				digitalWrite(manPin, HIGH);
 			}
+
 			wipeColor(blue, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
-			if (!speedMode) solidColor(blue, 0, 0, stripLength);
+
+			if (!speedMode) 
+			{
+				solidColor(blue, 0, 0, stripLength);
+			}
 			else
 			{
 				solidColor(yellow, 0, firstPixel(3), lastPixel(4));

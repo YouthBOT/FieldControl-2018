@@ -332,10 +332,12 @@ namespace YbotFieldControl
             GameStartUp();
             Thread.Sleep (200);
 
-            autoModeTime = 30;
+            autoModeTime = 10;
             manAutoTime = 0;
-            midModeTime = 90;
-            time.CountDownStart(2, 30);
+            //midModeTime = 90;
+            //time.CountDownStart(2, 30);
+            midModeTime = 15;
+            time.CountDownStart(1, 15);
             time.timesUp = false;
             gameTimer.Start();
 
@@ -374,6 +376,7 @@ namespace YbotFieldControl
             ClearDisplay();
 
             GameStartUp (GameModes.manual);
+            speedMode = false;
             Thread.Sleep(200);
             GameLog("Manual Mode Started");
 
@@ -388,7 +391,8 @@ namespace YbotFieldControl
             DisableGameButtons ();
             ClearDisplay ();
 
-            GameStartUp (GameModes.speed);
+            GameStartUp (GameModes.manual);
+            speedMode = true;
             Thread.Sleep (200);
             GameLog ("Speed Mode Started");
 
@@ -1062,15 +1066,16 @@ namespace YbotFieldControl
                 GD.lblGameClock.ForeColor = Color.Black;
             }
             // In manual mode and not passed manual time
-            else if (gameMode == GameModes.manual && !time.CheckTimeElapsed (midModeTime)) {
+            else if (gameMode == GameModes.manual && !time.CheckTimeElapsed (midModeTime) && !_speedMode) {
 
             }
             // In manual mode and passed mid point time
-            else if (gameMode == GameModes.manual && time.CheckTimeElapsed (midModeTime)) {
-                gameMode = fc.ChangeGameMode (GameModes.speed);
+            else if (gameMode == GameModes.manual && time.CheckTimeElapsed (midModeTime) && !_speedMode) {
+                _speedMode = true;
+                fc.switchMode = true;
             }
             // In speed mode
-            else if (gameMode == GameModes.speed) {
+            else if (gameMode == GameModes.manual && _speedMode) {
 
             } else {
                 Console.WriteLine ("Something went wrong with time keeping, please looking into this");

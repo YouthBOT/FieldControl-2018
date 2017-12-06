@@ -38,7 +38,6 @@ namespace YbotFieldControl
         autonomous,
         mantonomous,
         manual,
-        speed,
         end,
         off,
         debug,

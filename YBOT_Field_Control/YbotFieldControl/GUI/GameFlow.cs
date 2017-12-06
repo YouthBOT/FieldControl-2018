@@ -36,6 +36,7 @@ namespace YbotFieldControl
             speedGreenSwitchTurnedOn = false;
             redSwitchTurnedOn = false;
             greenSwitchTurnedOn = false;
+            _speedMode = false;
 
             //Switch Game Mode to Reset Field
             gameMode = fc.ChangeGameMode (GameModes.reset);
@@ -43,10 +44,11 @@ namespace YbotFieldControl
 
             //Clear all the nodes' information
             fc.ClearNodeState ();
+            fc.GetNodeState();
 
             // Set game field to ready
             gameMode = fc.ChangeGameMode(GameModes.ready);
-            Thread.Sleep(200);
+            Thread.Sleep(1000);
 
             // Set to mode and start game
             gameMode = fc.ChangeGameMode (mode);
@@ -99,8 +101,8 @@ namespace YbotFieldControl
                     GameLog ("Start Auto Mode");
                 }
 
-                AutoMode ();
-            } else if (gameMode == GameModes.manual) {
+                AutoMode ();                   
+            } else if (gameMode == GameModes.manual && !_speedMode) {
                 // Switching to manual mode
                 if (fc.switchMode) {
                     fc.switchMode = false;
@@ -122,7 +124,7 @@ namespace YbotFieldControl
                 }
 
                 ManualMode ();
-            } else if (gameMode == GameModes.speed) {
+            } else if (gameMode == GameModes.manual && _speedMode) {
                 // Switching to speed mode
                 if (fc.switchMode) {
                     fc.switchMode = false;
@@ -133,25 +135,24 @@ namespace YbotFieldControl
 
                     // Turn robots on in manaul
                     fc.RobotTransmitters ("both", State.off, State.on);
+                    // Get switch inputs
+                    fc.GetNodeState(3);
+                    fc.GetNodeState(8);
+                    Thread.Sleep(200);
 
                     // switch inputs are inverted
-                    greenSwitchTurnedOn |= !fc.InputState(3, SWITCH_UP_INPUT);
-                    redSwitchTurnedOn |= !fc.InputState(8, SWITCH_UP_INPUT);
+                    redSwitchTurnedOn = !fc.InputState(3, SWITCH_UP_INPUT);
+                    greenSwitchTurnedOn = !fc.InputState(8, SWITCH_UP_INPUT);
 
-                    // Send speed mode to button towers
-                    for (int i = 0; i < TOWER_COMBO_LENGTH; ++i) {
-						fc.SendMessage(BUTTON_TOWERS[i, 0], "7,0,1");
-						fc.SendMessage(BUTTON_TOWERS[i, 1], "7,0,1");
-					}
-                   
-                    // Pick a random tower combo
-                    selectedTowerCombo = randomNumber.Next (0, TOWER_COMBO_LENGTH);
-                    GameLog (string.Format ("Selecting speed towers {0} and {1}",
-                        BUTTON_TOWERS[selectedTowerCombo, 0],
-                        BUTTON_TOWERS[selectedTowerCombo, 1]));
-                    // Select those towers
-                    fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 0], "7,1,1");
-					fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 1], "7,1,1");
+                    // Turn off speed mode
+                    for (int i = 0; i < TOWER_COMBO_LENGTH; ++i)
+                    {
+                        fc.SendMessage(BUTTON_TOWERS[i, 0], "7,0,1");
+                        fc.SendMessage(BUTTON_TOWERS[i, 1], "7,0,1");
+                    }
+
+                    // Select a tower pair
+                    SelectSpeedTower();
 
                     // Get the starting elapsed time for the speed runs
                     startingTimeElapsed = time.elapsedTime.Elapsed.TotalSeconds;
@@ -164,80 +165,82 @@ namespace YbotFieldControl
         }
 
         public void AutoMode() {
-			// green turned the switch offf
-			if (!fc.InputState(3, SWITCH_DOWN_INPUT) && !autoGreenSwitchTurnedOff) {
+            // red turned the switch off
+            if (!fc.InputState(3, SWITCH_DOWN_INPUT) && !autoRedSwitchTurnedOff)
+            {
+                autoRedSwitchTurnedOff = true;
+                red.score += AUTO_SWITCH_TURNED_OFF_SCORE;
+            }
+
+            // green turned the switch offf
+            if (!fc.InputState(8, SWITCH_DOWN_INPUT) && !autoGreenSwitchTurnedOff)
+            {
                 autoGreenSwitchTurnedOff = true;
                 green.score += AUTO_SWITCH_TURNED_OFF_SCORE;
             }
 
-            // red turned the switch off
-            if (!fc.InputState(8, SWITCH_DOWN_INPUT) && !autoRedSwitchTurnedOff) {
-				autoRedSwitchTurnedOff = true;
-                red.score += AUTO_SWITCH_TURNED_OFF_SCORE;
-            }
-
             if (fc.node[1].scored && !autoTower1Pressed) {
                 autoTower1Pressed = true;
-				if (!autoGreenPressedOne) {
-					autoGreenPressedOne = true;
-					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
-				} else if (!autoGreenPressedTwo) {
-					autoGreenPressedTwo = true;
-					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				if (!autoRedPressedOne) {
+                    autoRedPressedOne = true;
+                    red.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoRedPressedTwo) {
+                    autoRedPressedTwo = true;
+					red.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
 				}
             }
 
             if (fc.node[3].scored && !autoTower3Pressed) {
 				autoTower3Pressed = true;
-				if (!autoGreenPressedOne) {
-					autoGreenPressedOne = true;
-					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
-				} else if (!autoGreenPressedTwo) {
-					autoGreenPressedTwo = true;
-					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				if (!autoRedPressedOne) {
+                    autoRedPressedOne = true;
+                    red.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoRedPressedTwo) {
+                    autoRedPressedTwo = true;
+                    red.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
 				}
 			}
 
 			if (fc.node[5].scored && !autoTower5Pressed) {
 				autoTower5Pressed = true;
-				if (!autoGreenPressedOne) {
-					autoGreenPressedOne = true;
-					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
-				} else if (!autoGreenPressedTwo) {
-					autoGreenPressedTwo = true;
-					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
+				if (!autoRedPressedOne) {
+                    autoRedPressedOne = true;
+                    red.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
+				} else if (!autoRedPressedTwo) {
+                    autoRedPressedTwo = true;
+                    red.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
 				}
 			}
 
 			if (fc.node[6].scored && !autoTower6Pressed) {
 				autoTower6Pressed = true;
-				if (!autoRedPressedOne) {
-					autoRedPressedOne = true;
+				if (!autoGreenPressedOne) {
+                    autoGreenPressedOne = true;
 					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
-				} else if (!autoRedPressedTwo) {
-					autoRedPressedTwo = true;
+				} else if (!autoGreenPressedTwo) {
+                    autoGreenPressedTwo = true;
 					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
 				}
 			}
 
 			if (fc.node[8].scored && !autoTower8Pressed) {
 				autoTower8Pressed = true;
-				if (!autoRedPressedOne) {
-					autoRedPressedOne = true;
+				if (!autoGreenPressedOne) {
+                    autoGreenPressedOne = true;
 					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
-				} else if (!autoRedPressedTwo) {
-					autoRedPressedTwo = true;
+				} else if (!autoGreenPressedTwo) {
+                    autoGreenPressedTwo = true;
 					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
 				}
 			}
 
 			if (fc.node[10].scored && !autoTower10Pressed) {
 				autoTower10Pressed = true;
-				if (!autoRedPressedOne) {
-					autoRedPressedOne = true;
+				if (!autoGreenPressedOne) {
+                    autoGreenPressedOne = true;
 					green.score += AUTO_FIRST_BUTTON_PRESSED_SCORE;
-				} else if (!autoRedPressedTwo) {
-					autoRedPressedTwo = true;
+				} else if (!autoGreenPressedTwo) {
+                    autoGreenPressedTwo = true;
 					green.score += AUTO_SECOND_BUTTON_PRESSED_SCORE;
 				}
 			}
@@ -248,25 +251,16 @@ namespace YbotFieldControl
         }
 
         public void SpeedMode() {
-            if (!fc.InputState(3, SWITCH_UP_INPUT) && !greenSwitchTurnedOn) {
-                speedGreenSwitchTurnedOn = true;
-                greenSwitchTurnedOn = true;
-                green.score += SPEED_SWITCH_TURNED_ON_SCORE;
-            } else if (!fc.InputState(3, SWITCH_DOWN_INPUT) && greenSwitchTurnedOn) {
-                // switch was turned on previously
-                if (speedGreenSwitchTurnedOn) {
-                    // subtract that score
-                    green.score -= SPEED_SWITCH_TURNED_ON_SCORE;
-                }
-                speedGreenSwitchTurnedOn = false;
-                greenSwitchTurnedOn = false;
-            }
-
-            if (!fc.InputState(8, SWITCH_UP_INPUT) && !redSwitchTurnedOn) {
+            if (!fc.InputState(3, SWITCH_UP_INPUT) && !redSwitchTurnedOn) {
                 speedRedSwitchTurnedOn = true;
                 redSwitchTurnedOn = true;
                 red.score += SPEED_SWITCH_TURNED_ON_SCORE;
-            } else if (!fc.InputState(8, SWITCH_DOWN_INPUT) && redSwitchTurnedOn) {
+
+                if (selectedTowerCombo != -1)
+                {
+                    fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 0], "7,0,1");
+                }
+            } else if (!fc.InputState(3, SWITCH_DOWN_INPUT) && redSwitchTurnedOn) {
                 // switch was turned on previously
                 if (speedRedSwitchTurnedOn) {
                     // subtract that score
@@ -274,34 +268,86 @@ namespace YbotFieldControl
                 }
                 speedRedSwitchTurnedOn = false;
                 redSwitchTurnedOn = false;
+
+                if (selectedTowerCombo != -1)
+                {
+                    fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 0], "7,1,1");
+                }
             }
 
-            // if time is still under the blocking time 
-            if (time.elapsedTime.Elapsed.TotalSeconds - startingTimeElapsed < BLOCKING_TIME) {
-                bool teamScored = false;
-                // green pressed the button
-				if (fc.node[BUTTON_TOWERS[selectedTowerCombo, 0]].scored && !greenSwitchTurnedOn) {
-                    green.score += SPEED_BUTTON_PRESSED_SCORE;
-                    teamScored = true;
-                // red pressed the button
-                } else if (fc.node[BUTTON_TOWERS[selectedTowerCombo, 1]].scored && !redSwitchTurnedOn) {
-                    red.score += SPEED_BUTTON_PRESSED_SCORE;
-                    teamScored = true;
-                }
+            if (!fc.InputState(8, SWITCH_UP_INPUT) && !greenSwitchTurnedOn)
+            {
+                speedGreenSwitchTurnedOn = true;
+                greenSwitchTurnedOn = true;
+                green.score += SPEED_SWITCH_TURNED_ON_SCORE;
 
-                // atleast one of the teams pressed a button, select a new tower combo
-                if (teamScored) {
-                    SelectSpeedTower ();
+                if (selectedTowerCombo != -1)
+                {
+                    fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 1], "7,0,1");
                 }
-            } else {
-                SelectSpeedTower ();
+            }
+            else if (!fc.InputState(8, SWITCH_DOWN_INPUT) && greenSwitchTurnedOn)
+            {
+                // switch was turned on previously
+                if (speedGreenSwitchTurnedOn)
+                {
+                    // subtract that score
+                    green.score -= SPEED_SWITCH_TURNED_ON_SCORE;
+                }
+                speedGreenSwitchTurnedOn = false;
+                greenSwitchTurnedOn = false;
+
+                if (selectedTowerCombo != -1)
+                {
+                    fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 1], "7,1,1");
+                }
+            }
+
+            if (!teamScored)
+            {
+                // if time is still under the blocking time 
+                if (time.elapsedTime.Elapsed.TotalSeconds - startingTimeElapsed < BLOCKING_TIME)
+                {
+                    // red pressed the button
+                    if (fc.node[BUTTON_TOWERS[selectedTowerCombo, 0]].scored && !redSwitchTurnedOn)
+                    {
+                        red.score += SPEED_BUTTON_PRESSED_SCORE;
+                        teamScored = true;
+                    // green pressed the button
+                    }
+                    else if (fc.node[BUTTON_TOWERS[selectedTowerCombo, 1]].scored && !greenSwitchTurnedOn)
+                    {
+                        green.score += SPEED_BUTTON_PRESSED_SCORE;
+                        teamScored = true;
+                    }
+
+                    // atleast one of the teams pressed a button, select a new tower combo
+                    if (teamScored)
+                    {
+                        SelectSpeedTower();
+                    }
+                }
+                else
+                {
+                    SelectSpeedTower();
+                }
             }
         }
 
-        private void SelectSpeedTower () {
+        private void SelectSpeedTower() {
             // Deselect towers
-            fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 0], "7,0,1");
-            fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 1], "7,0,1");
+            if (selectedTowerCombo != -1) {
+                GameLog(string.Format("Deselecting speed towers {0} and {1}",
+                    BUTTON_TOWERS[selectedTowerCombo, 0],
+                    BUTTON_TOWERS[selectedTowerCombo, 1]));
+                fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 0], "7,0,1");
+                fc.SendMessage(BUTTON_TOWERS[selectedTowerCombo, 1], "7,0,1");
+
+                // Clear scored flag
+                fc.node[BUTTON_TOWERS[selectedTowerCombo, 0]].scored = false;
+                fc.node[BUTTON_TOWERS[selectedTowerCombo, 1]].scored = false;
+                Thread.Sleep(200);
+            }
 
             // Pick new tower combo
             selectedTowerCombo = randomNumber.Next (0, TOWER_COMBO_LENGTH);
@@ -309,15 +355,20 @@ namespace YbotFieldControl
                 BUTTON_TOWERS[selectedTowerCombo, 0],
                 BUTTON_TOWERS[selectedTowerCombo, 1]));
             // Select towers
-            if (!greenSwitchTurnedOn) {
+            if (!redSwitchTurnedOn) {
                 fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 0], "7,1,1");
             }
-            if (!redSwitchTurnedOn) {
+            if (!greenSwitchTurnedOn) {
                 fc.SendMessage (BUTTON_TOWERS[selectedTowerCombo, 1], "7,1,1");
             }
 
+            // Clear scored flag
+            fc.node[BUTTON_TOWERS[selectedTowerCombo, 0]].scored = false;
+            fc.node[BUTTON_TOWERS[selectedTowerCombo, 1]].scored = false;
+
             // Restart time
             startingTimeElapsed = time.elapsedTime.Elapsed.TotalSeconds;
+            teamScored = false;
         }
 
         /// <summary>

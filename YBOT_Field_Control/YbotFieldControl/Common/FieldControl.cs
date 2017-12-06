@@ -642,10 +642,13 @@ namespace YbotFieldControl
         {
             if (node[_nodeID].type == ComModes.canBus)
             {
+                /*
                 int check = 1 << input;
                 int i = node[_nodeID].inputStatus & check;
                 if (i == check) return true;
                 return false;
+                */
+                return (node[_nodeID].inputStatus & (0x01 << input)) > 0;
             }
             return false;
         }
