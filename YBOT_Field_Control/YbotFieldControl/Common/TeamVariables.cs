@@ -161,76 +161,8 @@ namespace YbotFieldControl
         //------------------------------------------------------------------------------------------------\\
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
-
-        private int _autoTowerTested;           //Number of towers tested in automode
-        public int autoTowerTested
-        {
-            get { return _autoTowerTested; }
-            set { _autoTowerTested = value; }
-        }
-
-        private int _autoEmergencyTowerCycled;  //Number of towers cycled in automode
-        public int autoEmergencyTowerCycled
-        {
-            get { return _autoEmergencyTowerCycled; }
-            set { _autoEmergencyTowerCycled = value; }
-        }
-
-        private int _autoSolarPanelScore;       //Solar panel score for autonomous mode
-        public int autoSolarPanelScore
-        {
-            get { return _autoSolarPanelScore; }
-            set { _autoSolarPanelScore = value; }
-        }
-
-        private int _manSolarPanelScore1;
-        public int manSolarPanelScore1
-        {
-            get { return _manSolarPanelScore1; }
-            set { _manSolarPanelScore1 = value; }
-        }
-
-        private int _manSolarPanelScore2;
-        public int manSolarPanelScore2
-        {
-            get { return _manSolarPanelScore2; }
-            set { _manSolarPanelScore2 = value; }
-        }
-
-        private int _emergencyCleared;          //Number of towers cleared of emergency during manual mode
-        public int emergencyCleared
-        {
-            get { return _emergencyCleared; }
-            set { _emergencyCleared = value; }
-        }
-
-        private bool _rocketBonus;              //If the teams earn the rocket bonus
-        public bool rocketBonus
-        {
-            get { return _rocketBonus; }
-            set { _rocketBonus = value; }
-        }
-
-        private int _rocketPosition;            //Rocket position at the end of the game
-        public int rocketPosition
-        {
-            get { return _rocketPosition; }
-            set { _rocketPosition = value; }
-        }
-
-        private int _rockWeight;                //Rock weight in ounces
-        public int rockWeight
-        {
-            get { return _rockWeight; }
-            set { _rockWeight = value; }
-        }
-
-        private int _rockScore;                 //Final rock score
-        public int rockScore
-        {
-            get { return _rockScore; }
-            set { _rockScore = value; }
-        }
+        public int reactor;
+        public int speed;
 
         //Team color 
         public Team(string teamColor)
@@ -254,17 +186,6 @@ namespace YbotFieldControl
             this.manScore = 0;
             this.endGameScore = 0;
             this.autoMan = false;
-
-            this.autoEmergencyTowerCycled = 0;
-            this.autoSolarPanelScore = 0;
-            this.autoTowerTested = 0;
-            this.rocketBonus = false;
-            this.emergencyCleared = 0;
-            this.rocketPosition = 0;
-            this.rockScore = 0;
-            this.rockWeight = 0;
-            this.manSolarPanelScore1 = 0;
-            this.manSolarPanelScore2 = 0;
         }
 
         public void StoreTeamVariablesToSqlMatch (ref Match match) {
@@ -282,18 +203,7 @@ namespace YbotFieldControl
         }
 
         public void StoreJointVariablesToSqlMatch (ref Match match) {
-            match.autoCornersTested = autoTowerTested;
-            match.autoEmergencyCycled = autoEmergencyTowerCycled;
-            match.autoSolarPanel = autoSolarPanelScore;
-
-            match.manSolarPanel1 = manSolarPanelScore1;
-            match.manSolarPanel2 = manSolarPanelScore2;
-            match.manualEmergencyCleared = emergencyCleared;
-
-            match.rocketPosition = rocketPosition;
-            match.rockWeight = rockWeight;
-            match.rockScore = rockScore;
-            match.rocketBonus = rocketBonus ? 1 : 0;
+            
         }
     }
 }

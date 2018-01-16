@@ -18,17 +18,5 @@ namespace YBotSqlWrapper
         public int redPenalty;
         public int redDq;
         public string redResult;
-
-        public int autoCornersTested;
-        public int autoEmergencyCycled;
-        public int autoSolarPanel;
-
-        public int manSolarPanel1;
-        public int manSolarPanel2;
-        public int manualEmergencyCleared;
-        public int rocketPosition;
-        public int rockScore;
-        public int rockWeight;
-        public int rocketBonus;
     }
 }

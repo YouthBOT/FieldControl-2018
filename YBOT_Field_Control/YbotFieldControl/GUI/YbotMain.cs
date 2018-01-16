@@ -75,7 +75,7 @@ namespace YbotFieldControl
                         row.Cells["Node_Status"].Value = "Checking Connection";                         //Display Checking Connections
                         Application.DoEvents();
 
-                        if (this.fc.TestConnections(nodeID))                                            //If the node is available
+                        if (fc.TestConnections(nodeID))                                            //If the node is available
                         {
                             row.Cells["Node_Status"].Value = "Connected";                               //Report Connected to Data Grid
                         }

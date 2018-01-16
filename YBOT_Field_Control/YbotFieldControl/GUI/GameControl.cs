@@ -332,11 +332,12 @@ namespace YbotFieldControl
             GameStartUp();
             Thread.Sleep (200);
 
-            autoModeTime = 10;
             manAutoTime = 0;
+            //autoModeTime = 60;
             //midModeTime = 90;
             //time.CountDownStart(2, 30);
-            midModeTime = 15;
+            autoModeTime = 30;
+            midModeTime = 35;
             time.CountDownStart(1, 15);
             time.timesUp = false;
             gameTimer.Start();
@@ -511,7 +512,7 @@ namespace YbotFieldControl
             score.Close();
 
             if (accept) {
-                //ScoreGame(); // not used this year
+                ScoreGame(); // not used this year
                 RecordGame();
 
                 btnStop.BackColor = Color.Red;
@@ -545,7 +546,6 @@ namespace YbotFieldControl
             UpdateDisplays ();
         }
 
-        // Not used this year
         private void ScoreGame()
         {
             //Add convert additional points to intergers here
@@ -584,47 +584,34 @@ namespace YbotFieldControl
             string folder = @"Matches\" + "Match " + matchNumber.ToString();
             string folder2 = @"Matches\";
 
-            string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text + "\t" + green.finalScore.ToString()
-                               + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
-            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
-                green.autoTowerTested,
-                green.autoEmergencyTowerCycled,
-                green.autoSolarPanelScore,
-                green.manSolarPanelScore1,
-                green.manSolarPanelScore2,
-                green.emergencyCleared,
-                green.rocketPosition,
-                green.rockWeight,
-                green.rockScore,
-                green.rocketBonus);
-
-
             string field = ("Match Number" + "\t" + "Team Name" + "\t" + "Final Score" + "\t" + "Penalties" + "\t" + "DQ" + "\t" + "Result");
-            string field2 = ("Auto Tested" + "\t" + "Auto Cycled" + "\t" + "Auto Solar" + "\t" + "Manual Solar 1" + "\t" + "Manual Solar 2" + "\t" + 
-                "Emergencies Clear" + "\t" + "Rocket Position" + "\t" + "Rock Weight" + "\t" + "Rock Score" + "\t" + "Rocket Bonus");
+            string field2 = ("Auto Switch Off" + "\t" + "Auto Right" + "\t" + "Auto Left" + "\t" + "Manual Reactor" + "\t" + "Manual Speed"
+                + "\t" + "Speed Switch On");
 
-            string text = "\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2;
+            string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text + "\t" + green.finalScore.ToString()
+                              + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
+            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
+                autoGreenSwitchTurnedOff,
+                autoTower5Pressed,
+                autoTower1Pressed,
+                green.reactor,
+                green.speed,
+                speedGreenSwitchTurnedOn);
 
-			if (!IsChampionshipMatch()) {
-				string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
-								 + "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
+			string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
+								+ "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
 
-				string redTeam2 = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
-					red.autoTowerTested,
-					red.autoEmergencyTowerCycled,
-					red.autoSolarPanelScore,
-					red.manSolarPanelScore1,
-					red.manSolarPanelScore2,
-					red.emergencyCleared,
-					red.rocketPosition,
-					red.rockWeight,
-					red.rockScore,
-					red.rocketBonus);
+            string redTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
+                autoRedSwitchTurnedOff,
+                autoTower10Pressed,
+                autoTower6Pressed,
+                red.reactor,
+                red.speed,
+                speedRedSwitchTurnedOn);
 
-				text += "\r\n" + redTeam + "\t" + redTeam2;
-			}
+            string text = "\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2 + "\r\n" + redTeam + "\t" + redTeam2;
 
-			try {
+            try {
 				lw.WriteLog(text, file, folder);
 				lw.WriteLog(text, file2, folder2);
 			} catch {
@@ -705,7 +692,7 @@ namespace YbotFieldControl
         {
 			if (YbotSql.Instance.IsConnected) {
 				int matchId = matchNumber;
-				var match = YbotSql.Instance.GetMatch(YBotSqlData.Global.tournaments[YBotSqlData.Global.currentTournament].id, matchId);
+				var match = YbotSql.Instance.GetMatch (YBotSqlData.Global.tournaments[YBotSqlData.Global.currentTournament].id, matchId);
 				while (match.Status == TaskStatus.Running
 				       || match.Status == TaskStatus.Created 
 				       || match.Status == TaskStatus.WaitingForActivation

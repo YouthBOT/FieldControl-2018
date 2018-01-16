@@ -504,20 +504,20 @@ namespace YbotFieldControl
         public void SetOutputState(int _nodeID, int _OutputNum, State _state)
         {
             byte newState;
-            int Output = _OutputNum - 1;                                              //Get Output Location
-            byte currentSate = this.node[_nodeID].outputStatus;                      //Get Current State
+            var Output = _OutputNum - 1;                                              //Get Output Location
+            var currentSate = node[_nodeID].outputStatus;                      //Get Current State
             if (_state == State.on) newState = (byte)((1 << Output) | currentSate);  //Update State
             else newState = (byte)(~(1 << Output) & currentSate);
-            this.node[_nodeID].outputStatus = newState;                              //Update this.node status
+            node[_nodeID].outputStatus = newState;                              //Update this.node status
 
-            ComModes mode = new ComModes();
+            var mode = new ComModes();
             mode = this.node[_nodeID].type;
 
             switch (mode)
             {
                 case ComModes.canBus:
-                    int nodeAddress = Convert.ToInt32(this.node[_nodeID].address);
-                    this.cb.SetOutput(nodeAddress, _OutputNum, _state);                   //Send Output request
+                    var nodeAddress = Convert.ToInt32(this.node[_nodeID].address);
+                    cb.SetOutput(nodeAddress, _OutputNum, _state);                   //Send Output request
                     break;
 
                 case ComModes.xBee:
@@ -574,10 +574,8 @@ namespace YbotFieldControl
 					// <TODO> determine switch inputs
 					switch (nodeID) {
 					case 1:
-					case 3:
 					case 5:
 					case 6:
-					case 8:
 					case 10:
 						// at least one of the buttons is pressed
 						if (InputState(nodeID, 0) || InputState(nodeID, 1)) {
@@ -586,7 +584,19 @@ namespace YbotFieldControl
 							node[nodeID].scored = false;
 						}
 						break;
-					default:
+                    case 3:
+                    case 8:
+                        // at least one of the buttons is pressed
+                        if (!InputState(nodeID, 0) || !InputState(nodeID, 1))
+                        {
+                            node[nodeID].scored = true;
+                        }
+                        else
+                        {
+                            node[nodeID].scored = false;
+                        }
+                        break;
+                        default:
 						break;
 					}
                 }

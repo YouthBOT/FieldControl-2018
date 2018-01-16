@@ -76,7 +76,7 @@ byte nodeStatus[8] = { 5, 0, 0, 0, 0, 0, 0, 0 };
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region IO Variables
 //Input Pin number - Pin# of Filtered Digital Inputs - 99 if not used
-uint8_t inputPins[6] = { 10, 11, 99, 99, 99, 99 };	//Green 10, Red 11
+uint8_t inputPins[6] = { 9, 9, 11, 10, 99, 99 };	//Green 10, Red 11
 //Output Pin number - Pin# of Output - 99 if not used
 uint8_t outputPins[6] = { 99, 99, 99, 99, 99, 99 };
 //LED Pin number (Uno 13, Leonardo 23)
@@ -476,10 +476,17 @@ void gamePlayCanbus()
 	{
 		if (gameModeChanged)
 		{
+			solidColor(blue, 0, 0, stripLength);
+
 			gameModeChanged = false;
 			switchTurnedOff = false;
-			towerSelected = false;
 			complete = false;
+
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				digitalWrite(autoPin, HIGH);
+				digitalWrite(manPin, LOW);
+			}
 		}
 
 		byte oldState = nodeStatus[4];
@@ -487,28 +494,21 @@ void gamePlayCanbus()
 
 		if (oldState != nodeStatus[4])
 		{
-			if (towerSelected && !complete) 
-			{
-				boolean button1 = inputStates[0];
-				boolean button2 = inputStates[1];
+			boolean switchDown = inputStates[3];
 
-				if (button1 || button2)
+			if ((nodeID == 3) || (nodeID == 8))
+			{
+				if (!switchTurnedOff)
 				{
-					report(0, commandNode);
-					flashColor(yellow, 0, 3, 0, stripLength);
-					complete = true;
-					towerSelected = false;
+					if (switchDown)
+					{
+						report(0, commandNode);
+						towerSelected = false;
+						flashColor(blue, 0, 3, 0, stripLength);
+						switchTurnedOff = true;
+					}
 				}
 			}
-			else
-			{
-				solidColor(off, 0, 0, stripLength);
-			}
-		}
-
-		if (towerSelected) {
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
 		}
 	}
 	else if (gameMode == 4)	//Man-Tonomous
@@ -524,6 +524,18 @@ void gamePlayCanbus()
 				digitalWrite(manPin, HIGH);
 			}
 		}
+
+		//if (!complete)
+		//{
+		//	if (towerSelected)
+		//	{
+		//		solidColor(yellow, 0, 0, stripLength);
+		//	}
+		//	else
+		//	{
+		//		solidColor(blue, 0, 0, stripLength);
+		//	}
+		//}
 	}
 	else if (gameMode == 5)	//Manual Mode
 	{
@@ -556,7 +568,6 @@ void gamePlayCanbus()
 			gameModeChanged = false;
 			complete = false;
 			speedMode = false;
-			towerSelected = false;
 		}
 
 		if (speedMode)
@@ -567,8 +578,8 @@ void gamePlayCanbus()
 			{
 				if (towerSelected)
 				{
-					boolean button1 = inputStates[1];
-					boolean button2 = inputStates[0];
+					boolean button1 = !inputStates[1];
+					boolean button2 = !inputStates[0];
 
 					if (button1 || button2)
 					{

@@ -165,38 +165,18 @@ namespace YBotSqlWrapper
 
                 if (await reader.ReadAsync()) {
                     var obj = reader[0];
-                    if (obj.GetType() != typeof(System.DBNull)) {
-                        query = String.Empty;
+                    if (obj.GetType() != typeof(DBNull)) {
+                        query = string.Empty;
                         try {
                             var id = Convert.ToInt32(obj);
 
-                            if (match.tournamentId == 5) {
-                                query = "UPDATE matches " +
-                                    "SET played = 1, " +
-                                    string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
-                                        match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, "S") +
-                                    string.Format("auto_corners_tested = {0}, auto_emergency_cycled = {1}, auto_solar_panel = {2}, ",
-                                        match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
-                                    string.Format("manual_solar_panel_1 = {0}, manual_solar_panel_2 = {1}, manual_emergency_cleared = {2}, ",
-                                        match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
-                                    string.Format("rocket_position = {0}, rock_weight = {1}, rock_score = {2}, rocket_bonus = {3} ",
-                                        match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus) +
-                                    string.Format("WHERE match_id = {0};", id);
-                            } else {
-                                query = "UPDATE matches " +
-                                    "SET played = 1, " +
-                                    string.Format("red_team = {0}, red_score = {1}, red_penalty = {2}, red_dq = {3}, red_result = '{4}', ",
-                                        match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
-                                    string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
-                                        match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
-                                    string.Format("auto_corners_tested = {0}, auto_emergency_cycled = {1}, auto_solar_panel = {2}, ",
-                                        match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
-                                    string.Format("manual_solar_panel_1 = {0}, manual_solar_panel_2 = {1}, manual_emergency_cleared = {2}, ",
-                                        match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
-                                    string.Format("rocket_position = {0}, rock_weight = {1}, rock_score = {2}, rocket_bonus = {3} ",
-                                        match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus) +
-                                    string.Format("WHERE match_id = {0};", id);
-                            }
+                            query = "UPDATE matches " +
+                                "SET played = 1, " +
+                                string.Format("red_team = {0}, red_score = {1}, red_penalty = {2}, red_dq = {3}, red_result = '{4}', ",
+                                    match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
+                                string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
+                                    match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) + 
+                                string.Format("WHERE match_id = {0};", id);
                         } catch (Exception ex) {
                             SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                         } finally {
@@ -230,16 +210,10 @@ namespace YBotSqlWrapper
                 var query = "INSERT INTO matches " +
                     "(tournament_id, match_number, played, " +
                     "red_team, red_score, red_penalty, red_dq, red_result, " +
-                    "green_team, green_score, green_penalty, green_dq, green_result, " +
-                    "auto_corners_tested, auto_emergency_cycled, auto_solar_panel, " +
-                    "manual_solar_panel_1, manual_solar_panel_2, manual_emergency_cleared, " +
-                    "rocket_position, rock_weight, rock_score, rocket_bonus) " +
+                    "green_team, green_score, green_penalty, green_dq, green_result) " +
                     string.Format("VALUES ({0}, {1}, 1, ", match.tournamentId, match.matchNumber) +
                     string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
-                    string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
-                    string.Format("{0}, {1}, {2}, ", match.autoCornersTested, match.autoEmergencyCycled, match.autoSolarPanel) +
-                    string.Format("{0}, {1}, {2}, ", match.manSolarPanel1, match.manSolarPanel2, match.manualEmergencyCleared) +
-                    string.Format("{0}, {1}, {2}, {3});", match.rocketPosition, match.rockWeight, match.rockScore, match.rocketBonus);
+                    string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult);
 
                 var command = new MySqlCommand(query, sql);
 
@@ -309,9 +283,17 @@ namespace YBotSqlWrapper
                         try {
                             match.matchNumber = Convert.ToInt32(reader[2]);
                             match.greenTeam = Convert.ToInt32(reader[9]);
-                            match.greenScore = Convert.ToInt32(reader[10]);
+                            try {
+                                match.greenScore = Convert.ToInt32 (reader[10]);
+                            } catch {
+                                match.greenScore = 0;
+                            }
                             match.redTeam = Convert.ToInt32(reader[4]);
-                            match.redScore = Convert.ToInt32(reader[5]);
+                            try {
+                                match.redScore = Convert.ToInt32(reader[5]);
+                            } catch {
+                                match.redScore = 0;
+                            }
                         } catch (Exception ex) {
                             SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                         }
