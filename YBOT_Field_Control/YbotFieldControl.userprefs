@@ -1,10 +1,10 @@
 ﻿<Properties StartupConfiguration="{45037B3E-1276-44D3-B4D6-E2C0CE14B681}|Default">
   <MonoDevelop.Ide.Workbench ActiveDocument="YbotFieldControl/GUI/GameFlow.cs">
     <Files>
-      <File FileName="YbotFieldControl/GUI/GameFlow.cs" Line="155" Column="23" />
-      <File FileName="YbotFieldControl/Common/FieldControl.cs" Line="577" Column="48" />
+      <File FileName="YbotFieldControl/GUI/GameFlow.cs" Line="312" Column="32" />
+      <File FileName="YbotFieldControl/GUI/GameVariables.cs" Line="64" Column="35" />
+      <File FileName="YbotFieldControl/Common/FieldControl.cs" Line="583" Column="21" />
       <File FileName="YbotFieldControl/GUI/GameControl.cs" Line="1141" Column="10" />
-      <File FileName="YbotFieldControl/GUI/GameVariables.cs" Line="55" Column="34" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.ItemProperties.YbotFieldControl PreferredExecutionTarget="MonoDevelop.Default" />
