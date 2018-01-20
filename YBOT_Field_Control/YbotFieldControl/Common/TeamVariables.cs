@@ -161,8 +161,16 @@ namespace YbotFieldControl
         //------------------------------------------------------------------------------------------------\\
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
-        public int reactor;
-        public int speed;
+        public bool autoSwitchTurnedOff;
+        public bool autoRightTowerPressed;
+        public bool autoLeftTowerPressed;
+        public int rodsRemoved;
+        public int rodsReplaced;
+        public int reactorMultiplier;
+        public int reactorScore;
+        public int speedTowers;
+        public bool manualSwitchTurnedOn;
+        public int speedScore;
 
         //Team color 
         public Team(string teamColor)
@@ -175,18 +183,29 @@ namespace YbotFieldControl
         /// </summary>
         public void Reset()
         {
-            this.score = 0;
-            this.autoCount = 0;
-            this.finalScore = 0;
-            this.penalty = 0;
-            this.dq = false;
-            this.matchResult = null;
-            this.autoFinished = false;
-            this.autoScore = 0;
-            this.manScore = 0;
-            this.endGameScore = 0;
-            this.autoMan = false;
-        }
+            score = 0;
+            autoCount = 0;
+            finalScore = 0;
+            penalty = 0;
+            dq = false;
+            matchResult = null;
+            autoFinished = false;
+            autoScore = 0;
+            manScore = 0;
+            endGameScore = 0;
+            autoMan = false;
+
+            autoSwitchTurnedOff = false;
+            autoRightTowerPressed = false;
+            autoLeftTowerPressed = false;
+            rodsRemoved = 0;
+            rodsReplaced = 0;
+            reactorMultiplier = 1;
+            reactorScore = 0;
+            speedTowers = 0;
+            manualSwitchTurnedOn = false;
+            speedScore = 0;
+    }
 
         public void StoreTeamVariablesToSqlMatch (ref Match match) {
             if (teamColor.Equals ("red", StringComparison.OrdinalIgnoreCase)) {

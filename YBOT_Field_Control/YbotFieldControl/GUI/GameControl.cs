@@ -512,8 +512,8 @@ namespace YbotFieldControl
             score.Close();
 
             if (accept) {
-                ScoreGame(); // not used this year
-                RecordGame();
+                ScoreGame();
+                //RecordGame();
 
                 btnStop.BackColor = Color.Red;
                 btnStartGame.BackColor = DefaultBackColor;
@@ -590,24 +590,24 @@ namespace YbotFieldControl
 
             string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text + "\t" + green.finalScore.ToString()
                               + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
-            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
-                autoGreenSwitchTurnedOff,
-                autoTower5Pressed,
-                autoTower1Pressed,
-                green.reactor,
-                green.speed,
-                speedGreenSwitchTurnedOn);
+            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
+                green.autoSwitchTurnedOff,
+                green.autoRightTowerPressed,
+                green.autoLeftTowerPressed,
+                green.reactorScore,
+                green.reactorScore,
+                green.manualSwitchTurnedOn);
 
 			string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
 								+ "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
 
             string redTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
-                autoRedSwitchTurnedOff,
-                autoTower10Pressed,
-                autoTower6Pressed,
-                red.reactor,
-                red.speed,
-                speedRedSwitchTurnedOn);
+                red.autoSwitchTurnedOff,
+                red.autoRightTowerPressed,
+                red.autoLeftTowerPressed,
+                red.reactorScore,
+                red.reactorScore,
+                red.manualSwitchTurnedOn);
 
             string text = "\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2 + "\r\n" + redTeam + "\t" + redTeam2;
 
@@ -1053,16 +1053,16 @@ namespace YbotFieldControl
                 GD.lblGameClock.ForeColor = Color.Black;
             }
             // In manual mode and not passed manual time
-            else if (gameMode == GameModes.manual && !time.CheckTimeElapsed (midModeTime) && !_speedMode) {
+            else if (gameMode == GameModes.manual && !time.CheckTimeElapsed (midModeTime) && !speedMode) {
 
             }
             // In manual mode and passed mid point time
-            else if (gameMode == GameModes.manual && time.CheckTimeElapsed (midModeTime) && !_speedMode) {
-                _speedMode = true;
+            else if (gameMode == GameModes.manual && time.CheckTimeElapsed (midModeTime) && !speedMode) {
+                speedMode = true;
                 fc.switchMode = true;
             }
             // In speed mode
-            else if (gameMode == GameModes.manual && _speedMode) {
+            else if (gameMode == GameModes.manual && speedMode) {
 
             } else {
                 Console.WriteLine ("Something went wrong with time keeping, please looking into this");

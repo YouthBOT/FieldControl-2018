@@ -59,34 +59,15 @@ namespace YbotFieldControl
 		private const int SWITCH_UP_INPUT = 2;
 		private const int SWITCH_DOWN_INPUT = 3;
 
-        private bool _speedMode = false;
-        public bool speedMode {
-            get {
-                return _speedMode;
-            }
-            set {
-                _speedMode = value;
-            }
-        }
-
-        private bool autoRedSwitchTurnedOff = false;
-        private bool autoGreenSwitchTurnedOff = false;
-        private bool autoTower1Pressed = false;
-        private bool autoTower5Pressed = false;
-        private bool autoTower6Pressed = false;
-        private bool autoTower10Pressed = false;
-        private bool speedRedSwitchTurnedOn = false;
-        private bool speedGreenSwitchTurnedOn = false;
+        private bool speedMode = false;
         private bool redSwitchTurnedOn = false;
         private bool greenSwitchTurnedOn = false;
-        private bool speedTeamToggle = false;
-
+        private bool speedTeamCheckToggle = false;
         private bool teamScored = false;
 
-        // <TODO> determine scores
         public const int AUTO_SWITCH_TURNED_OFF_SCORE = 75;
-        public const int AUTO_FIRST_BUTTON_PRESSED_SCORE = 50;
-        public const int AUTO_SECOND_BUTTON_PRESSED_SCORE = 25;
+        public const int AUTO_RIGHT_TOWER_PRESSED_SCORE = 50;
+        public const int AUTO_LEFT_TOWER_PRESSED_SCORE = 25;
         public const int SPEED_BUTTON_PRESSED_SCORE = 10;
         public const int SPEED_SWITCH_TURNED_ON_SCORE = 50;
     }
