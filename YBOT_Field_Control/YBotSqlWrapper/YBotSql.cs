@@ -176,6 +176,8 @@ namespace YBotSqlWrapper
                                     match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
                                 string.Format("green_team = {0}, green_score = {1}, green_penalty = {2}, green_dq = {3}, green_result = '{4}', ",
                                     match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) + 
+                                string.Format("notes = '{2}\tRed:{0}\tGreen{1}'", 
+                                    match.redTeamVariables, match.greenTeamVariables, match.teamVariables) +
                                 string.Format("WHERE match_id = {0};", id);
                         } catch (Exception ex) {
                             SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
@@ -210,10 +212,11 @@ namespace YBotSqlWrapper
                 var query = "INSERT INTO matches " +
                     "(tournament_id, match_number, played, " +
                     "red_team, red_score, red_penalty, red_dq, red_result, " +
-                    "green_team, green_score, green_penalty, green_dq, green_result) " +
+                    "green_team, green_score, green_penalty, green_dq, green_result, notes) " +
                     string.Format("VALUES ({0}, {1}, 1, ", match.tournamentId, match.matchNumber) +
                     string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
-                    string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult);
+                    string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
+                    string.Format("'{2}\tRed:{0}\tGreen{1}'", match.redTeamVariables, match.greenTeamVariables, match.teamVariables);
 
                 var command = new MySqlCommand(query, sql);
 

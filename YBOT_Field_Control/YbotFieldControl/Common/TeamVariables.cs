@@ -207,17 +207,31 @@ namespace YbotFieldControl
             speedScore = 0;
     }
 
-        public void StoreTeamVariablesToSqlMatch (ref Match match) {
+        public void StoreTeamVariablesToSqlMatch (
+            ref Match match, 
+            string teamVariableString, 
+            string teamVariables=null)
+        {
             if (teamColor.Equals ("red", StringComparison.OrdinalIgnoreCase)) {
                 match.redScore = finalScore;
                 match.redPenalty = penalty;
                 match.redDq = dq ? 1 : 0;
                 match.redResult = matchResult;
+
+                match.redTeamVariables = teamVariableString;
+                if (teamVariables != null) {
+                    match.teamVariables = teamVariables;
+                }
             } else {
                 match.greenScore = finalScore;
                 match.greenPenalty = penalty;
                 match.greenDq = dq ? 1 : 0;
                 match.greenResult = matchResult;
+
+                match.greenTeamVariables = teamVariableString;
+                if (teamVariables != null) {
+                    match.teamVariables = teamVariables;
+                }
             }
         }
 

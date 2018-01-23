@@ -131,9 +131,9 @@
             this.lblRedPenalty2.MinimumSize = new System.Drawing.Size(50, 25);
             this.lblRedPenalty2.Name = "lblRedPenalty2";
             this.lblRedPenalty2.Padding = new System.Windows.Forms.Padding(5);
-            this.lblRedPenalty2.Size = new System.Drawing.Size(111, 37);
+            this.lblRedPenalty2.Size = new System.Drawing.Size(124, 37);
             this.lblRedPenalty2.TabIndex = 142;
-            this.lblRedPenalty2.Text = "- 10 pts ";
+            this.lblRedPenalty2.Text = "- 100 pts ";
             this.lblRedPenalty2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblRedPenalty3
@@ -147,9 +147,9 @@
             this.lblRedPenalty3.MinimumSize = new System.Drawing.Size(50, 25);
             this.lblRedPenalty3.Name = "lblRedPenalty3";
             this.lblRedPenalty3.Padding = new System.Windows.Forms.Padding(5);
-            this.lblRedPenalty3.Size = new System.Drawing.Size(111, 37);
+            this.lblRedPenalty3.Size = new System.Drawing.Size(124, 37);
             this.lblRedPenalty3.TabIndex = 143;
-            this.lblRedPenalty3.Text = "- 10 pts ";
+            this.lblRedPenalty3.Text = "- 100 pts ";
             this.lblRedPenalty3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // grbFieldDisplay
@@ -217,9 +217,9 @@
             this.lblGreenPenalty1.MinimumSize = new System.Drawing.Size(50, 25);
             this.lblGreenPenalty1.Name = "lblGreenPenalty1";
             this.lblGreenPenalty1.Padding = new System.Windows.Forms.Padding(5);
-            this.lblGreenPenalty1.Size = new System.Drawing.Size(111, 37);
+            this.lblGreenPenalty1.Size = new System.Drawing.Size(124, 37);
             this.lblGreenPenalty1.TabIndex = 146;
-            this.lblGreenPenalty1.Text = "- 10 pts ";
+            this.lblGreenPenalty1.Text = "- 100 pts ";
             this.lblGreenPenalty1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblGreenPenalty2
@@ -233,9 +233,9 @@
             this.lblGreenPenalty2.MinimumSize = new System.Drawing.Size(50, 25);
             this.lblGreenPenalty2.Name = "lblGreenPenalty2";
             this.lblGreenPenalty2.Padding = new System.Windows.Forms.Padding(5);
-            this.lblGreenPenalty2.Size = new System.Drawing.Size(111, 37);
+            this.lblGreenPenalty2.Size = new System.Drawing.Size(124, 37);
             this.lblGreenPenalty2.TabIndex = 147;
-            this.lblGreenPenalty2.Text = "- 10 pts ";
+            this.lblGreenPenalty2.Text = "- 100 pts ";
             this.lblGreenPenalty2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblGreenPenalty3
@@ -249,9 +249,9 @@
             this.lblGreenPenalty3.MinimumSize = new System.Drawing.Size(50, 25);
             this.lblGreenPenalty3.Name = "lblGreenPenalty3";
             this.lblGreenPenalty3.Padding = new System.Windows.Forms.Padding(5);
-            this.lblGreenPenalty3.Size = new System.Drawing.Size(111, 37);
+            this.lblGreenPenalty3.Size = new System.Drawing.Size(124, 37);
             this.lblGreenPenalty3.TabIndex = 148;
-            this.lblGreenPenalty3.Text = "- 10 pts ";
+            this.lblGreenPenalty3.Text = "- 100 pts ";
             this.lblGreenPenalty3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // lblGreenDQ
@@ -320,9 +320,9 @@
             this.lblRedPenalty1.MinimumSize = new System.Drawing.Size(50, 25);
             this.lblRedPenalty1.Name = "lblRedPenalty1";
             this.lblRedPenalty1.Padding = new System.Windows.Forms.Padding(5);
-            this.lblRedPenalty1.Size = new System.Drawing.Size(111, 37);
+            this.lblRedPenalty1.Size = new System.Drawing.Size(124, 37);
             this.lblRedPenalty1.TabIndex = 141;
-            this.lblRedPenalty1.Text = "- 10 pts ";
+            this.lblRedPenalty1.Text = "- 100 pts ";
             this.lblRedPenalty1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // grbRedPenalty

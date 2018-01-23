@@ -475,6 +475,7 @@
             this.tbRedSpeedTowers.Tag = "";
             this.tbRedSpeedTowers.Text = "0";
             this.tbRedSpeedTowers.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.tbRedSpeedTowers.Visible = false;
             this.tbRedSpeedTowers.Validating += new System.ComponentModel.CancelEventHandler(this.TextBoxValidation);
             this.tbRedSpeedTowers.Validated += new System.EventHandler(this.OnValidation);
             // 
@@ -781,9 +782,9 @@
             this.lbRedRodsReplaced.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.lbRedRodsReplaced.Location = new System.Drawing.Point(6, 212);
             this.lbRedRodsReplaced.Name = "lbRedRodsReplaced";
-            this.lbRedRodsReplaced.Size = new System.Drawing.Size(153, 24);
+            this.lbRedRodsReplaced.Size = new System.Drawing.Size(140, 24);
             this.lbRedRodsReplaced.TabIndex = 268;
-            this.lbRedRodsReplaced.Text = "Rods Replaced";
+            this.lbRedRodsReplaced.Text = "Loaded Fresh";
             this.lbRedRodsReplaced.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbRedAuto
@@ -839,9 +840,9 @@
             this.lbRedRodsRemoved.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.lbRedRodsRemoved.Location = new System.Drawing.Point(6, 175);
             this.lbRedRodsRemoved.Name = "lbRedRodsRemoved";
-            this.lbRedRodsRemoved.Size = new System.Drawing.Size(153, 24);
+            this.lbRedRodsRemoved.Size = new System.Drawing.Size(161, 24);
             this.lbRedRodsRemoved.TabIndex = 264;
-            this.lbRedRodsRemoved.Text = "Rods Removed";
+            this.lbRedRodsRemoved.Text = "Stored Depleted";
             this.lbRedRodsRemoved.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // tbRedRodsRemoved
@@ -1207,9 +1208,9 @@
             this.lbGreenRodsReplaced.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.lbGreenRodsReplaced.Location = new System.Drawing.Point(6, 212);
             this.lbGreenRodsReplaced.Name = "lbGreenRodsReplaced";
-            this.lbGreenRodsReplaced.Size = new System.Drawing.Size(153, 24);
+            this.lbGreenRodsReplaced.Size = new System.Drawing.Size(140, 24);
             this.lbGreenRodsReplaced.TabIndex = 226;
-            this.lbGreenRodsReplaced.Text = "Rods Replaced";
+            this.lbGreenRodsReplaced.Text = "Loaded Fresh";
             this.lbGreenRodsReplaced.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbGreenRodsRemovedScore
@@ -1254,9 +1255,9 @@
             this.lbGreenRodsRemoved.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.lbGreenRodsRemoved.Location = new System.Drawing.Point(6, 175);
             this.lbGreenRodsRemoved.Name = "lbGreenRodsRemoved";
-            this.lbGreenRodsRemoved.Size = new System.Drawing.Size(153, 24);
+            this.lbGreenRodsRemoved.Size = new System.Drawing.Size(161, 24);
             this.lbGreenRodsRemoved.TabIndex = 222;
-            this.lbGreenRodsRemoved.Text = "Rods Removed";
+            this.lbGreenRodsRemoved.Text = "Stored Depleted";
             this.lbGreenRodsRemoved.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // lbGreenAutoScore

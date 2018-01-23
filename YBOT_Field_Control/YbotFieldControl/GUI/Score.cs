@@ -261,7 +261,7 @@ namespace YbotFieldControl
                 red.speedScore = redSpeedScore;
                 red.penalty = redPenaltyScore + redPushScore;
                 red.dq = cbRedDq.Checked;
-                red.score = redFinalScore;
+                red.finalScore = redFinalScore;
 
                 green.autoSwitchTurnedOff = cbGreenAutoSwitchOff.Checked;
                 green.autoRightTowerPressed = cbGreenAutoRightTower.Checked;
@@ -276,7 +276,7 @@ namespace YbotFieldControl
                 green.speedScore = greenSpeedScore;
                 green.penalty = greenPenaltyScore + greenPushScore;
                 green.dq = cbGreenDq.Checked;
-                green.score = greenFinalScore;
+                green.finalScore = greenFinalScore;
             }
         }
 

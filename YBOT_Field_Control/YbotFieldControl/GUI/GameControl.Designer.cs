@@ -64,7 +64,9 @@
             this.grbRedScore = new System.Windows.Forms.GroupBox();
             this.btnRedMantonomous = new System.Windows.Forms.Button();
             this.grbGameMode = new System.Windows.Forms.GroupBox();
+            this.btnSpeedMode = new System.Windows.Forms.Button();
             this.btnTestMode = new System.Windows.Forms.Button();
+            this.btnSetupGame = new System.Windows.Forms.Button();
             this.grbGreenScore = new System.Windows.Forms.GroupBox();
             this.btnGreenMantonomous = new System.Windows.Forms.Button();
             this.dsScores = new System.Data.DataSet();
@@ -77,7 +79,6 @@
             this.lblChampionshipRounds = new System.Windows.Forms.Label();
             this.btnChampionshipRoundNext = new System.Windows.Forms.Button();
             this.btnChampionshipRoundPrevious = new System.Windows.Forms.Button();
-            this.btnSpeedMode = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -114,7 +115,7 @@
             this.lblGreenPenalty1.Name = "lblGreenPenalty1";
             this.lblGreenPenalty1.Size = new System.Drawing.Size(87, 40);
             this.lblGreenPenalty1.TabIndex = 136;
-            this.lblGreenPenalty1.Text = "- 200 pts ";
+            this.lblGreenPenalty1.Text = "- 100 pts ";
             this.lblGreenPenalty1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblGreenPenalty1.Click += new System.EventHandler(this.lblGreenPenalty1_Click);
             // 
@@ -130,7 +131,7 @@
             this.lblGreenPenalty2.Name = "lblGreenPenalty2";
             this.lblGreenPenalty2.Size = new System.Drawing.Size(87, 40);
             this.lblGreenPenalty2.TabIndex = 137;
-            this.lblGreenPenalty2.Text = "- 200 pts ";
+            this.lblGreenPenalty2.Text = "- 100 pts ";
             this.lblGreenPenalty2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblGreenPenalty2.Click += new System.EventHandler(this.lblGreenPenalty2_Click);
             // 
@@ -146,7 +147,7 @@
             this.lblGreenPenalty3.Name = "lblGreenPenalty3";
             this.lblGreenPenalty3.Size = new System.Drawing.Size(87, 40);
             this.lblGreenPenalty3.TabIndex = 138;
-            this.lblGreenPenalty3.Text = "- 200 pts ";
+            this.lblGreenPenalty3.Text = "- 100 pts ";
             this.lblGreenPenalty3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblGreenPenalty3.Click += new System.EventHandler(this.lblGreenPenalty3_Click);
             // 
@@ -194,7 +195,7 @@
             this.lblRedPenalty1.Name = "lblRedPenalty1";
             this.lblRedPenalty1.Size = new System.Drawing.Size(87, 40);
             this.lblRedPenalty1.TabIndex = 131;
-            this.lblRedPenalty1.Text = "- 200 pts ";
+            this.lblRedPenalty1.Text = "- 100 pts ";
             this.lblRedPenalty1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblRedPenalty1.Click += new System.EventHandler(this.lblRedPenalty1_Click);
             // 
@@ -210,7 +211,7 @@
             this.lblRedPenalty3.Name = "lblRedPenalty3";
             this.lblRedPenalty3.Size = new System.Drawing.Size(87, 40);
             this.lblRedPenalty3.TabIndex = 133;
-            this.lblRedPenalty3.Text = "- 200 pts ";
+            this.lblRedPenalty3.Text = "- 100 pts ";
             this.lblRedPenalty3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblRedPenalty3.Click += new System.EventHandler(this.lblRedPenalty3_Click);
             // 
@@ -226,7 +227,7 @@
             this.lblRedPenalty2.Name = "lblRedPenalty2";
             this.lblRedPenalty2.Size = new System.Drawing.Size(87, 40);
             this.lblRedPenalty2.TabIndex = 132;
-            this.lblRedPenalty2.Text = "- 200 pts ";
+            this.lblRedPenalty2.Text = "- 100 pts ";
             this.lblRedPenalty2.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblRedPenalty2.Click += new System.EventHandler(this.lblRedPenalty2_Click);
             // 
@@ -389,6 +390,7 @@
             this.btnStartGame.TabIndex = 60;
             this.btnStartGame.Text = "START GAME";
             this.btnStartGame.UseVisualStyleBackColor = false;
+            this.btnStartGame.Visible = false;
             this.btnStartGame.Click += new System.EventHandler(this.btnStartGame_Click);
             // 
             // btnAutoMode
@@ -578,6 +580,7 @@
             this.grbGameMode.Controls.Add(this.btnScoreGame);
             this.grbGameMode.Controls.Add(this.btnAutoMode);
             this.grbGameMode.Controls.Add(this.btnPracticeMode);
+            this.grbGameMode.Controls.Add(this.btnSetupGame);
             this.grbGameMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.grbGameMode.Location = new System.Drawing.Point(19, 4);
             this.grbGameMode.Margin = new System.Windows.Forms.Padding(10);
@@ -586,6 +589,18 @@
             this.grbGameMode.TabIndex = 148;
             this.grbGameMode.TabStop = false;
             this.grbGameMode.Text = "Game Modes";
+            // 
+            // btnSpeedMode
+            // 
+            this.btnSpeedMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSpeedMode.Location = new System.Drawing.Point(786, 17);
+            this.btnSpeedMode.Margin = new System.Windows.Forms.Padding(10);
+            this.btnSpeedMode.Name = "btnSpeedMode";
+            this.btnSpeedMode.Size = new System.Drawing.Size(100, 75);
+            this.btnSpeedMode.TabIndex = 147;
+            this.btnSpeedMode.Text = "Speed Mode";
+            this.btnSpeedMode.UseVisualStyleBackColor = true;
+            this.btnSpeedMode.Click += new System.EventHandler(this.btnSpeedMode_Click);
             // 
             // btnTestMode
             // 
@@ -598,6 +613,19 @@
             this.btnTestMode.Text = "Test Mode";
             this.btnTestMode.UseVisualStyleBackColor = true;
             this.btnTestMode.Click += new System.EventHandler(this.btnTestMode_Click);
+            // 
+            // btnSetupGame
+            // 
+            this.btnSetupGame.BackColor = System.Drawing.SystemColors.Control;
+            this.btnSetupGame.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSetupGame.Location = new System.Drawing.Point(128, 17);
+            this.btnSetupGame.Margin = new System.Windows.Forms.Padding(5);
+            this.btnSetupGame.Name = "btnSetupGame";
+            this.btnSetupGame.Size = new System.Drawing.Size(100, 75);
+            this.btnSetupGame.TabIndex = 148;
+            this.btnSetupGame.Text = "SETUP GAME";
+            this.btnSetupGame.UseVisualStyleBackColor = false;
+            this.btnSetupGame.Click += new System.EventHandler(this.btnSetupGame_Click);
             // 
             // grbGreenScore
             // 
@@ -725,18 +753,6 @@
             this.btnChampionshipRoundPrevious.Visible = false;
             this.btnChampionshipRoundPrevious.Click += new System.EventHandler(this.btnChampionshipRound_Click);
             // 
-            // btnSpeedMode
-            // 
-            this.btnSpeedMode.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSpeedMode.Location = new System.Drawing.Point(786, 17);
-            this.btnSpeedMode.Margin = new System.Windows.Forms.Padding(10);
-            this.btnSpeedMode.Name = "btnSpeedMode";
-            this.btnSpeedMode.Size = new System.Drawing.Size(100, 75);
-            this.btnSpeedMode.TabIndex = 147;
-            this.btnSpeedMode.Text = "Speed Mode";
-            this.btnSpeedMode.UseVisualStyleBackColor = true;
-            this.btnSpeedMode.Click += new System.EventHandler(this.btnSpeedMode_Click);
-            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -833,5 +849,6 @@
         public System.Windows.Forms.Button btnChampionshipRoundNext;
         public System.Windows.Forms.Button btnChampionshipRoundPrevious;
         private System.Windows.Forms.Button btnSpeedMode;
+        public System.Windows.Forms.Button btnSetupGame;
     }
 }

@@ -95,6 +95,7 @@ int manTonState = 1;
 /// <summary> Program Flags Variables </summary>
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 boolean towerSelected = false;		//If the tower is selected
+uint32_t speedColor = yellow;		//
 uint8_t selectedState = 0;			//Selected state of tower
 boolean gameModeChanged = true;		//If mode is changed
 boolean complete = false;			//If task is complete
@@ -109,7 +110,6 @@ int messagesRecieved = 0;
 boolean speedMode = false;			//Sun's state True = on, False = off
 boolean alarmState = false;			//Alarm state True = on, False = off
 boolean testedState = false;		//Tower's teseted state True = tested, False = not tested
-int colorCycle = 0;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 /// <method> Ardiuno Setup Method</method>
@@ -412,13 +412,22 @@ void execute()
 		if (canIn[1] == 1)
 		{
 			towerSelected = true;
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
+			speedColor = red;
+		}
+		else if (canIn[1] == 2)
+		{
+			towerSelected = true;
+			speedColor = green;
 		}
 		else
 		{
 			towerSelected = false;
 			solidColor(off, 0, 0, stripLength);
+		}
+
+		if (towerSelected) 
+		{
+			solidColor(speedColor, 0, 0, stripLength);
 		}
 
 		if (canIn[2] == 1)
@@ -445,28 +454,10 @@ void gamePlayCanbus()
 			gameModeChanged = false;
 			complete = false;
 			switchTurnedOff = false;
-			colorCycle = 0;
 		}
 
-		switch (colorCycle) {
-		case 0:
-			wipeColor(blue, 0, 1, 0, stripLength);
-			break;
-		case 1:
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			break;
-		case 2:
-			wipeColor(purple, 0, 1, 0, stripLength);
-			break;
-		case 3:
-			wipeColor(white, 0, 1, 0, stripLength);
-			break;
-		default:
-			wipeColor(blue, 0, 1, 0, stripLength);
-			break;
-		}
+		wipeColor(purple, 0, 1, 0, stripLength);
 		wipeColor(off, 0, 1, 0, stripLength);
-		colorCycle = ++colorCycle % 4;
 	}
 	else if (gameMode == 2)	//Start
 	{
@@ -495,7 +486,7 @@ void gamePlayCanbus()
 				if (button1 || button2)
 				{
 					report(0, commandNode);
-					flashColor(yellow, 0, 3, 0, stripLength);
+					flashColor(speedColor, 0, 3, 0, stripLength);
 					complete = true;
 					towerSelected = false;
 				}
@@ -504,11 +495,6 @@ void gamePlayCanbus()
 			{
 				solidColor(off, 0, 0, stripLength);
 			}
-		}
-
-		if (towerSelected) {
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
 		}
 	}
 	else if (gameMode == 4)	//Man-Tonomous
@@ -551,8 +537,9 @@ void gamePlayCanbus()
 				}
 			}
 			
-			wipeColor(blue, 0, 1, 0, stripLength);
+			wipeColor(yellow, 0, 1, 0, stripLength);
 			wipeColor(off, 0, 1, 0, stripLength);
+			solidColor(yellow, 0, 0, stripLength);
 			gameModeChanged = false;
 			complete = false;
 			speedMode = false;
@@ -574,53 +561,28 @@ void gamePlayCanbus()
 					{
 						report(0, commandNode);
 						towerSelected = false;
-						flashColor(yellow, 0, 3, 0, stripLength);
+						flashColor(speedColor, 0, 3, 0, stripLength);
 						solidColor(off, 0, 0, stripLength);
-					}
-				}
-					
-				if ((nodeID == 3) || (nodeID == 8))
-				{
-					boolean switchDown = inputStates[3];
-					boolean switchUp = inputStates[2];
-
-					if (switchTurnedOff)
-					{
-						if (switchUp)
-						{
-							report(0, commandNode);
-							flashColor(blue, 0, 3, 0, stripLength);
-							solidColor(blue, 0, 0, stripLength);
-							switchTurnedOff = false;
-							towerSelected = false;
-						}
-					} 
-					else 
-					{
-						if (switchDown)
-						{
-							report(0, commandNode);
-							flashColor(blue, 0, 3, 0, stripLength);
-							solidColor(blue, 0, 0, stripLength);
-							switchTurnedOff = true;
-						}
 					}
 				}
 			}
 
+			/*
 			if (towerSelected)
 			{
-				wipeColor(yellow, 0, 1, 0, stripLength);
+				wipeColor(speedColor, 0, 1, 0, stripLength);
 				wipeColor(off, 0, 1, 0, stripLength);
 			}
 			else
 			{
 				solidColor(off, 0, 0, stripLength);
 			}
+			*/
 		}
 		else
 		{
-			solidColor(off, 0, 0, stripLength);
+			wipeColor(yellow, 0, 1, 0, stripLength);
+			wipeColor(off, 0, 1, 0, stripLength);
 		}
 
 

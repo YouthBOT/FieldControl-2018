@@ -50,10 +50,13 @@ namespace YbotFieldControl
         //------------------------------------------------------------------------------------------------\\
         //Current year's game variables
         //------------------------------------------------------------------------------------------------\\
-        private Random randomNumber = new Random();   //Random Number
+        private Random randomTowerNumber = new Random();   //Random Number
+        private Random randomTeamNumber = new Random(); 
         private double startingTimeElapsed = 0;
 		private readonly int[,] BUTTON_TOWERS = {{1, 6}, {3, 8}, {5, 10}};
 		private const int TOWER_COMBO_LENGTH = 3;
+        private int redTower = -1;
+        private int greenTower = -1;
         private int selectedTowerCombo = -1;
         private const int BLOCKING_TIME = 10;
 		private const int SWITCH_UP_INPUT = 2;

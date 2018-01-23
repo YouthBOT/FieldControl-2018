@@ -198,7 +198,14 @@ namespace YbotFieldControl
                 btnDisableGreen.ForeColor = Color.Lime;
                 GD.lblGreenScore.BackColor = GameControl.DefaultBackColor;
                 GD.lblGreenScore.ForeColor = Color.Lime;
-                this.fc.RobotTransmitters("green", State.on, State.on);
+                if (gameMode == GameModes.manual)
+                {
+                    fc.RobotTransmitters("green", State.off, State.on);
+                }
+                else
+                {
+                    fc.RobotTransmitters("green", State.on, State.on);
+                }
                 this.GameLog("Green Disabled = False");
             }
         }
@@ -311,8 +318,15 @@ namespace YbotFieldControl
                 btnDisableRed.ForeColor = Color.Red;
                 GD.lblRedScore.BackColor = GameControl.DefaultBackColor;
                 GD.lblRedScore.ForeColor = Color.Red;
-                this.fc.RobotTransmitters("red", State.on, State.on);
-                this.GameLog("Red Disabled = False");
+                if (gameMode == GameModes.manual)
+                {
+                    fc.RobotTransmitters("red", State.off, State.on);
+                } 
+                else
+                {
+                    fc.RobotTransmitters("red", State.on, State.on);
+                }
+                GameLog("Red Disabled = False");
             }
         }
 
@@ -329,16 +343,19 @@ namespace YbotFieldControl
             lblGameClock.ForeColor = Color.Blue;
             GD.lblGameClock.ForeColor = Color.Blue;
 
+            btnSetupGame.Visible = true;
+            btnStartGame.Visible = false;
+
             GameStartUp();
             Thread.Sleep (200);
 
             manAutoTime = 0;
-            //autoModeTime = 60;
-            //midModeTime = 90;
-            //time.CountDownStart(2, 30);
             autoModeTime = 30;
-            midModeTime = 35;
-            time.CountDownStart(1, 15);
+            midModeTime = 90;
+            time.CountDownStart(2, 30);
+            //autoModeTime = 30;
+            //midModeTime = 35;
+            //time.CountDownStart(1, 15);
             time.timesUp = false;
             gameTimer.Start();
 
@@ -352,6 +369,9 @@ namespace YbotFieldControl
             gameTimer.Stop ();
             practiceTimer.Stop ();
             testTimer.Stop ();
+
+            btnStartGame.Visible = false;
+            btnSetupGame.Visible = true;
 
             GameLog ("Field Off");
             LogGame ();
@@ -513,7 +533,7 @@ namespace YbotFieldControl
 
             if (accept) {
                 ScoreGame();
-                //RecordGame();
+                RecordGame();
 
                 btnStop.BackColor = Color.Red;
                 btnStartGame.BackColor = DefaultBackColor;
@@ -585,29 +605,41 @@ namespace YbotFieldControl
             string folder2 = @"Matches\";
 
             string field = ("Match Number" + "\t" + "Team Name" + "\t" + "Final Score" + "\t" + "Penalties" + "\t" + "DQ" + "\t" + "Result");
-            string field2 = ("Auto Switch Off" + "\t" + "Auto Right" + "\t" + "Auto Left" + "\t" + "Manual Reactor" + "\t" + "Manual Speed"
-                + "\t" + "Speed Switch On");
+            string field2 = ("Auto Switch Off" + "\t" + "Auto Right" + "\t" + "Auto Left" + "\t" + "Auto Score" 
+                + "\t" + "Depleted Stored" + "\t" + "Loaded Fresh" + "\t" + "Rod Zone" + "\t" + "Reactor Score"
+                + "\t" + "Speed Towers" + "\t" + "Manual Switch On" + "\t" + "Speed Score" + "\t" + "Manual Score");
 
             string greenTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text + "\t" + green.finalScore.ToString()
                               + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
-            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}",
+            string greenTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
                 green.autoSwitchTurnedOff,
                 green.autoRightTowerPressed,
                 green.autoLeftTowerPressed,
+                green.autoScore,
+                green.rodsRemoved,
+                green.rodsReplaced,
+                green.reactorMultiplier,
                 green.reactorScore,
-                green.reactorScore,
-                green.manualSwitchTurnedOn);
+                green.speedTowers,
+                green.manualSwitchTurnedOn,
+                green.speedScore,
+                green.manScore);
 
-			string redTeam = (matchNumber.ToString() + "\t" + lblRedTeam.Text + "\t" + red.finalScore.ToString()
-								+ "\t" + red.penalty.ToString() + "\t" + red.dq.ToString() + "\t" + red.matchResult);
-
-            string redTeam2 = string.Format ("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}", 
+			string redTeam = (matchNumber.ToString() + "\t" + lblGreenTeam.Text + "\t" + green.finalScore.ToString()
+                              + "\t" + green.penalty.ToString() + "\t" + green.dq.ToString() + "\t" + green.matchResult);
+            string redTeam2 = string.Format("{0}\t{1}\t{2}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}",
                 red.autoSwitchTurnedOff,
                 red.autoRightTowerPressed,
                 red.autoLeftTowerPressed,
+                red.autoScore,
+                red.rodsRemoved,
+                red.rodsReplaced,
+                red.reactorMultiplier,
                 red.reactorScore,
-                red.reactorScore,
-                red.manualSwitchTurnedOn);
+                red.speedTowers,
+                red.manualSwitchTurnedOn,
+                red.speedScore,
+                red.manScore);
 
             string text = "\r\n" + field + "\t" + field2 + "\r\n" + greenTeam + "\t" + greenTeam2 + "\r\n" + redTeam + "\t" + redTeam2;
 
@@ -625,13 +657,11 @@ namespace YbotFieldControl
 					match.matchNumber = matchNumber;
 					green.StoreJointVariablesToSqlMatch(ref match);
 
-					green.StoreTeamVariablesToSqlMatch(ref match);
+					green.StoreTeamVariablesToSqlMatch(ref match, greenTeam2, field2);
 					match.greenTeam = FindSchoolId(schools, lblGreenTeam.Text, "Green Team");
 
-					if (!IsChampionshipMatch()) {
-						red.StoreTeamVariablesToSqlMatch(ref match);
-						match.redTeam = FindSchoolId(schools, lblRedTeam.Text, "Red Team");
-					}
+					red.StoreTeamVariablesToSqlMatch(ref match, redTeam2, field2);
+					match.redTeam = FindSchoolId(schools, lblRedTeam.Text, "Red Team");
 
 					YbotSql.Instance.AddMatch(match);
 				}
@@ -787,6 +817,7 @@ namespace YbotFieldControl
 
         private void DisableGameButtons () {
             btnStartGame.Enabled = false;
+            btnSetupGame.Enabled = false;
             btnAutoMode.Enabled = false;
             btnManualMode.Enabled = false;
             btnSpeedMode.Enabled = false;
@@ -799,6 +830,7 @@ namespace YbotFieldControl
 
         private void EnableGameButtons () {
             btnStartGame.Enabled = true;
+            btnSetupGame.Enabled = true;
             btnAutoMode.Enabled = true;
             btnManualMode.Enabled = true;
             btnSpeedMode.Enabled = true;
@@ -1131,6 +1163,13 @@ namespace YbotFieldControl
 
                 fc.RobotTransmitters("red", State.off, State.on);
             }
+        }
+
+        private void btnSetupGame_Click(object sender, EventArgs e)
+        {
+            GameStartUp(GameModes.ready);
+            btnSetupGame.Visible = false;
+            btnStartGame.Visible = true;
         }
     }
 
