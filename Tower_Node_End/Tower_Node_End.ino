@@ -31,8 +31,8 @@ uint32_t red = light.Color(brt, 0, 0);
 uint32_t green = light.Color(0, brt, 0);
 uint32_t blue = light.Color(0, 0, brt);
 uint32_t white = light.Color(brt, brt, brt);
-uint32_t yellow = light.Color(brt, brt, 0);
-uint32_t purple = light.Color(brt, 0, brt);
+uint32_t yellow = light.Color(25, 25, 0);
+uint32_t purple = light.Color(40, 0, 40);
 uint32_t off = light.Color(0, 0, 0);
 #pragma endregion
 
@@ -658,8 +658,32 @@ void gamePlayCanbus()
 		}
 		else
 		{
-			wipeColor(yellow, 0, 1, 0, stripLength);
-			wipeColor(off, 0, 1, 0, stripLength);
+			byte oldState = nodeStatus[4];
+			updateInputs();
+			if (oldState != nodeStatus[4])
+			{
+				boolean switchDown = inputStates[3];
+
+				if (switchDown)
+				{
+					switchTurnedOff = true;
+				}
+				else 
+				{
+					switchTurnedOff = false;
+				}
+			}
+
+			if (switchTurnedOff) 
+			{
+				wipeColor(yellow, 0, 1, 0, stripLength);
+				wipeColor(off, 0, 1, 0, stripLength);
+			}
+			else 
+			{
+				wipeColor(blue, 0, 1, 0, stripLength);
+				wipeColor(off, 0, 1, 0, stripLength);
+			}
 		}
 
 
