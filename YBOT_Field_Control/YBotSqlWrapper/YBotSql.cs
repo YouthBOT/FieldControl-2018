@@ -117,6 +117,48 @@ namespace YBotSqlWrapper
             }
         }
 
+        public async void GetGlobalData () {
+            if ((sql != null) && (IsConnected)) {
+                try {
+                    var query = "SELECT * FROM tournaments " +
+                        string.Format ("WHERE YEAR(tournament_date)={0};", DateTime.Now.Year);
+                    var command = new MySqlCommand (query, sql);
+                    var reader = await command.ExecuteReaderAsync ();
+                    while (await reader.ReadAsync ()) {
+                        try {
+                            var id = Convert.ToInt32 (reader[0]);
+                            var date = (DateTime)reader[1];
+                            var name = (string)reader[2];
+
+                            var t = new Tournament (id, date, name);
+                            YBotSqlData.Global.tournaments.Add (t);
+                        } catch (Exception ex) {
+                            SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                        }
+                    }
+                    reader.Close ();
+
+                    query = "SELECT * FROM schools;";
+                    command = new MySqlCommand (query, sql);
+                    reader = await command.ExecuteReaderAsync ();
+                    while (await reader.ReadAsync ()) {
+                        try {
+                            var id = Convert.ToInt32 (reader[0]);
+                            var name = (string)reader[1];
+
+                            var s = new School (id, name);
+                            YBotSqlData.Global.schools.Add (s);
+                        } catch (Exception ex) {
+                            SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                        }
+                    }
+                    reader.Close ();
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                }
+            }
+        }
+
         public async void AddLog(string text, string type) {
             if ((sql != null) && (IsConnected)) {
                 if (text.IsNotEmpty()) {
@@ -193,6 +235,10 @@ namespace YBotSqlWrapper
                             } catch (MySqlException ex) {
                                 SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
                             }
+
+                            if (match.tournamentId == 14) {
+                                UpdateTournamentBrackets (match);
+                            }
                         }
                     } else {
                         await AddNewMatch(match);
@@ -207,73 +253,227 @@ namespace YBotSqlWrapper
             }
         }
 
-        private async Task AddNewMatch(Match match) {
+        private readonly Dictionary<int, int> WinningBracketPairs = new Dictionary <int, int> {
+            {101, 104},
+            {102, 105},
+            {103, 105},
+            {104, 109},
+            {105, 109},
+            {106, 107},
+            {107, 110},
+            {108, 110},
+            {109, 112},
+            {110, 111},
+            {111, 112},
+            {112, 113}};
+
+        private readonly Dictionary<int,int> LosingBracketPairs = new Dictionary<int, int> {
+            {101, 108},
+            {102, 106},
+            {103, 106},
+            {104, 107},
+            {105, 108},
+            {109, 111},
+            {112, 113}};
+
+        private void UpdateTournamentBrackets (Match match) {
+            if (match.tournamentId == 14) {
+                // The match was a tie and no one advances
+                if (match.redResult == "T" || match.greenResult == "T") {
+                    return;
+                }
+
+                if (WinningBracketPairs.ContainsKey (match.matchNumber)) {
+                    var winnersMatch = new Match ();
+                    winnersMatch.tournamentId = 14;
+                    winnersMatch.matchNumber = WinningBracketPairs[match.matchNumber];
+                    if (match.redResult == "W") {
+                        winnersMatch.redTeam = match.redTeam;
+                    } else {
+                        winnersMatch.redTeam = match.greenTeam;
+                    }
+                    UpdateBracketMatch (winnersMatch);
+                }
+
+                if (LosingBracketPairs.ContainsKey (match.matchNumber)) {
+                    var losersMatch = new Match ();
+                    losersMatch.matchNumber = LosingBracketPairs[match.matchNumber];
+                    losersMatch.tournamentId = 14;
+                    if (match.redResult == "L") {
+                        losersMatch.redTeam = match.redTeam;
+                    } else {
+                        losersMatch.redTeam = match.greenTeam;
+                    }
+                    UpdateBracketMatch (losersMatch);
+                }
+            }
+        }
+
+        private void UpdateBracketMatch (Match match) {
+            var query = "SELECT match_id FROM matches " +
+                string.Format ("WHERE tournament_id={0} and match_number={1};", 14, match.matchNumber);
+
+            var command = new MySqlCommand (query, sql);
+
+            System.Data.Common.DbDataReader reader;
+            try {
+                reader = command.ExecuteReader ();
+            } catch (MySqlException ex) {
+                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                return;
+            }
+
+            if (reader.Read ()) {
+                var obj = reader[0];
+                if (obj.GetType () != typeof (DBNull)) {
+                    query = string.Empty;
+                    try {
+                        var id = Convert.ToInt32 (obj);
+                        query = string.Format ("UPDATE matches SET red_team = {0} WHERE match_id = {1};", match.redTeam, id);
+                    } catch (Exception ex) {
+                        SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                    } finally {
+                        reader.Close ();
+                    }
+
+                    if (query.IsNotEmpty ()) {
+                        command = new MySqlCommand (query, sql);
+
+                        try {
+                            command.ExecuteNonQuery ();
+                        } catch (MySqlException ex) {
+                            SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                        }
+                    }
+                } else {
+                    if (!reader.IsClosed) {
+                        reader.Close ();
+                    }
+
+                    match.greenTeam = match.redTeam;
+                    match.redTeam = 16;
+                    AddBracketMatch (match);
+                }
+            } else {
+                if (!reader.IsClosed) {
+                    reader.Close ();
+                }
+
+                match.greenTeam = match.redTeam;
+                match.redTeam = 16;
+                AddBracketMatch (match);
+            }
+
+            if (!reader.IsClosed) {
+                reader.Close ();
+            }
+        }
+
+        public void AddNewBracketMatch (Match match) {
+            if (match.tournamentId == 14) {
+                var query = "SELECT match_id FROM matches " +
+                string.Format ("WHERE tournament_id={0} and match_number={1};", 14, match.matchNumber);
+
+                var command = new MySqlCommand (query, sql);
+
+                System.Data.Common.DbDataReader reader;
+                try {
+                    reader = command.ExecuteReader ();
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                    return;
+                }
+
+                if (reader.Read ()) {
+                    var obj = reader[0];
+                    if (obj.GetType () != typeof (DBNull)) {
+                        query = string.Empty;
+                        try {
+                            var id = Convert.ToInt32 (obj);
+                            query = string.Format ("UPDATE matches SET red_team = {0}, green_team = {0} WHERE match_id = {0};", match.redTeam, id);
+                        } catch (Exception ex) {
+                            SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                        } finally {
+                            reader.Close ();
+                        }
+
+                        if (query.IsNotEmpty ()) {
+                            command = new MySqlCommand (query, sql);
+
+                            try {
+                                command.ExecuteNonQuery ();
+                            } catch (MySqlException ex) {
+                                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                            }
+                        }
+                    } else {
+                        if (!reader.IsClosed) {
+                            reader.Close ();
+                        }
+
+                        AddBracketMatch (match);
+                    }
+                } else {
+                    if (!reader.IsClosed) {
+                        reader.Close ();
+                    }
+
+                    AddBracketMatch (match);
+                }
+
+                if (!reader.IsClosed) {
+                    reader.Close ();
+                }
+            } else {
+                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.General, "Can't add matches to this tournament"));
+            }
+        }
+
+        private void AddBracketMatch (Match match) {
+            if (match.tournamentId == 14) {
+                var query = "INSERT INTO matches " +
+                    "(tournament_id, match_number, played, " +
+                    "red_team, red_result, green_team, green_result) " +
+                    string.Format ("VALUES (14, {0}, 0, ", match.matchNumber) +
+                    string.Format ("{0}, 'I', {1}, 'I');", match.redTeam, match.greenTeam);
+
+                var command = new MySqlCommand (query, sql);
+
+                try {
+                    command.ExecuteNonQuery ();
+                } catch (MySqlException ex) {
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
+                }
+            } else {
+                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.General, "Can't add matches to this tournament"));
+            }
+        }
+
+        private async Task AddNewMatch (Match match) {
             if (match.tournamentId == 6) {
                 var query = "INSERT INTO matches " +
                     "(tournament_id, match_number, played, " +
                     "red_team, red_score, red_penalty, red_dq, red_result, " +
                     "green_team, green_score, green_penalty, green_dq, green_result, notes) " +
-                    string.Format("VALUES ({0}, {1}, 1, ", match.tournamentId, match.matchNumber) +
-                    string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
-                    string.Format("{0}, {1}, {2}, {3}, '{4}', ", match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
-                    string.Format("'{2}\tRed:{0}\tGreen{1}'", match.redTeamVariables, match.greenTeamVariables, match.teamVariables);
+                    string.Format ("VALUES ({0}, {1}, 1, ", match.tournamentId, match.matchNumber) +
+                    string.Format ("{0}, {1}, {2}, {3}, '{4}', ", match.redTeam, match.redScore, match.redPenalty, match.redDq, match.redResult) +
+                    string.Format ("{0}, {1}, {2}, {3}, '{4}', ", match.greenTeam, match.greenScore, match.greenPenalty, match.greenDq, match.greenResult) +
+                    string.Format ("'{2}\tRed:{0}\tGreen{1}'", match.redTeamVariables, match.greenTeamVariables, match.teamVariables);
 
-                var command = new MySqlCommand(query, sql);
+                var command = new MySqlCommand (query, sql);
 
                 try {
-                    await command.ExecuteNonQueryAsync();
+                    await command.ExecuteNonQueryAsync ();
                 } catch (MySqlException ex) {
-                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
+                    SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.Exception, ex.ToString ()));
                 }
             } else {
-                SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.General, "Can't add matches to this tournament"));
+                SqlMessageEvent?.Invoke (this, new SqlMessageArgs (SqlMessageType.General, "Can't add matches to this tournament"));
             }
         }
 
-        public async void GetGlobalData() {
-            if ((sql != null) && (IsConnected)) {
-                try {
-                    var query = "SELECT * FROM tournaments " +
-                        string.Format("WHERE YEAR(tournament_date)={0};", DateTime.Now.Year);
-                    var command = new MySqlCommand(query, sql);
-                    var reader = await command.ExecuteReaderAsync();
-                    while (await reader.ReadAsync()) {
-                        try {
-                            var id = Convert.ToInt32(reader[0]);
-                            var date = (DateTime)reader[1];
-                            var name = (string)reader[2];
-
-                            var t = new Tournament(id, date, name);
-                            YBotSqlData.Global.tournaments.Add(t);
-                        } catch (Exception ex) {
-                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
-                        }
-                    }
-                    reader.Close();
-
-                    query = "SELECT * FROM schools;";
-                    command = new MySqlCommand(query, sql);
-                    reader = await command.ExecuteReaderAsync();
-                    while (await reader.ReadAsync()) {
-                        try {
-                            var id = Convert.ToInt32(reader[0]);
-                            var name = (string)reader[1];
-
-                            var s = new School(id, name);
-                            YBotSqlData.Global.schools.Add(s);
-                        } catch (Exception ex) {
-                            SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
-                        }
-                    }
-                    reader.Close();
-                } catch (MySqlException ex) {
-                    SqlMessageEvent?.Invoke(this, new SqlMessageArgs(SqlMessageType.Exception, ex.ToString()));
-                }
-            }
-        }
-
-        public async Task<Match> GetMatch(int tournamentId, int matchNumber) {
-            var match = new Match();
+        public Match GetMatch(int tournamentId, int matchNumber) {
+            Match match = new Match ();
 
             if ((sql != null) && (IsConnected)) {
                 try {
@@ -281,8 +481,8 @@ namespace YBotSqlWrapper
                         string.Format("WHERE tournament_id={0} ", tournamentId) +
                         string.Format("AND match_number={0};", matchNumber);
                     var command = new MySqlCommand(query, sql);
-                    var reader = await command.ExecuteReaderAsync();
-                    while (await reader.ReadAsync()) {
+                    var reader = command.ExecuteReader ();
+                    while (reader.Read ()) {
                         try {
                             match.matchNumber = Convert.ToInt32(reader[2]);
                             match.greenTeam = Convert.ToInt32(reader[9]);

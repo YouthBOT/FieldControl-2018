@@ -79,6 +79,7 @@
             this.lblChampionshipRounds = new System.Windows.Forms.Label();
             this.btnChampionshipRoundNext = new System.Windows.Forms.Button();
             this.btnChampionshipRoundPrevious = new System.Windows.Forms.Button();
+            this.btnSeedBracket = new System.Windows.Forms.Button();
             this.grbGreenPenalty.SuspendLayout();
             this.grbFieldDisplay.SuspendLayout();
             this.grbRedPenalty.SuspendLayout();
@@ -723,7 +724,7 @@
             this.lblChampionshipRounds.Name = "lblChampionshipRounds";
             this.lblChampionshipRounds.Size = new System.Drawing.Size(228, 33);
             this.lblChampionshipRounds.TabIndex = 167;
-            this.lblChampionshipRounds.Text = "Practice";
+            this.lblChampionshipRounds.Text = "Round Robin";
             this.lblChampionshipRounds.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblChampionshipRounds.Visible = false;
             // 
@@ -753,11 +754,27 @@
             this.btnChampionshipRoundPrevious.Visible = false;
             this.btnChampionshipRoundPrevious.Click += new System.EventHandler(this.btnChampionshipRound_Click);
             // 
+            // btnSeedBracket
+            // 
+            this.btnSeedBracket.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.btnSeedBracket.Cursor = System.Windows.Forms.Cursors.Default;
+            this.btnSeedBracket.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnSeedBracket.Location = new System.Drawing.Point(546, 255);
+            this.btnSeedBracket.Margin = new System.Windows.Forms.Padding(10);
+            this.btnSeedBracket.Name = "btnSeedBracket";
+            this.btnSeedBracket.Size = new System.Drawing.Size(100, 75);
+            this.btnSeedBracket.TabIndex = 149;
+            this.btnSeedBracket.Text = "Seed Brackets";
+            this.btnSeedBracket.UseVisualStyleBackColor = true;
+            this.btnSeedBracket.Visible = false;
+            this.btnSeedBracket.Click += new System.EventHandler(this.btnSeedBracket_Click);
+            // 
             // GameControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1177, 637);
+            this.Controls.Add(this.btnSeedBracket);
             this.Controls.Add(this.btnChampionshipRoundNext);
             this.Controls.Add(this.btnChampionshipRoundPrevious);
             this.Controls.Add(this.lblChampionshipRounds);
@@ -850,5 +867,6 @@
         public System.Windows.Forms.Button btnChampionshipRoundPrevious;
         private System.Windows.Forms.Button btnSpeedMode;
         public System.Windows.Forms.Button btnSetupGame;
+        public System.Windows.Forms.Button btnSeedBracket;
     }
 }

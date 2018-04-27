@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,24 +18,12 @@ namespace YbotFieldControl
 {
     public partial class GameControl : Form
     {
-        Button btnAdvanceTeam;
-
 		public GameControl() : this (new FieldControl ()) { }
 
         public GameControl(FieldControl fc)
         {
             InitializeComponent();
             this.fc = fc;
-
-            btnAdvanceTeam = new Button();
-            btnAdvanceTeam.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
-            btnAdvanceTeam.Location = new Point(895, 125);
-            btnAdvanceTeam.Name = "btnAdvanceTeam";
-            btnAdvanceTeam.Size = new Size(100, 75);
-            btnAdvanceTeam.Text = "Advance Team";
-            btnAdvanceTeam.UseVisualStyleBackColor = true;
-            btnAdvanceTeam.Visible = false;
-            Controls.Add(btnAdvanceTeam);
 
 			if (YbotSql.Instance.IsConnected) {
                 InitializeSqlData ();
@@ -470,8 +459,12 @@ namespace YbotFieldControl
         private void btnMatchNext_Click(object sender, EventArgs e) {
             if (gameMode == GameModes.off) {
                 matchNumber++;
-                lblMatchNumber.Text = "Match " + matchNumber.ToString();
-                GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
+                var displayedMatchNumber = matchNumber;
+                if (IsChampionshipBracketMatch ()) {
+                    displayedMatchNumber -= 100;
+                }
+                lblMatchNumber.Text = "Match " + displayedMatchNumber.ToString();
+                GD.lblMatchNumber.Text = "Match " + displayedMatchNumber.ToString();
                 ClearDisplay();
                 GetTeamNames();
                 YBotSqlData.Global.currentMatchNumber = matchNumber;
@@ -481,8 +474,12 @@ namespace YbotFieldControl
         private void btnMatchPrev_Click(object sender, EventArgs e) {
             if (gameMode == GameModes.off) {
                 if (matchNumber > 0) matchNumber--;
-                lblMatchNumber.Text = "Match " + matchNumber.ToString();
-                GD.lblMatchNumber.Text = "Match " + matchNumber.ToString();
+                var displayedMatchNumber = matchNumber;
+                if (IsChampionshipBracketMatch ()) {
+                    displayedMatchNumber -= 100;
+                }
+                lblMatchNumber.Text = "Match " + displayedMatchNumber.ToString();
+                GD.lblMatchNumber.Text = "Match " + displayedMatchNumber.ToString();
                 ClearDisplay();
                 GetTeamNames();
                 YBotSqlData.Global.currentMatchNumber = matchNumber;
@@ -723,50 +720,40 @@ namespace YbotFieldControl
 			if (YbotSql.Instance.IsConnected) {
 				int matchId = matchNumber;
 				var match = YbotSql.Instance.GetMatch (YBotSqlData.Global.tournaments[YBotSqlData.Global.currentTournament].id, matchId);
-				while (match.Status == TaskStatus.Running
-				       || match.Status == TaskStatus.Created 
-				       || match.Status == TaskStatus.WaitingForActivation
-				       || match.Status == TaskStatus.WaitingForChildrenToComplete
-				       || match.Status == TaskStatus.WaitingToRun) 
-				{
-					continue;
+
+                var greenTeam = YBotSqlData.Global.schools[match.greenTeam];
+                var redTeam = YBotSqlData.Global.schools[match.redTeam];
+
+				if (greenTeam != null) {
+					lblGreenTeam.Text = greenTeam.name;
+					GD.lblGreenTeam.Text = greenTeam.name;
+				} else {
+					lblGreenTeam.Text = "Green Team";
+					GD.lblGreenTeam.Text = "Green Team";
 				}
 
-				if (match.Status == TaskStatus.RanToCompletion) {
-					var greenTeam = YBotSqlData.Global.schools[match.Result.greenTeam];
-					var redTeam = YBotSqlData.Global.schools[match.Result.redTeam];
-
-					if (greenTeam != null) {
-						lblGreenTeam.Text = greenTeam.name;
-						GD.lblGreenTeam.Text = greenTeam.name;
-					} else {
-						lblGreenTeam.Text = "Green Team";
-						GD.lblGreenTeam.Text = "Green Team";
-					}
-
-					if (redTeam != null) {
-						lblRedTeam.Text = redTeam.name;
-						GD.lblRedTeam.Text = redTeam.name;
-					} else {
-						lblRedTeam.Text = "Red Team";
-						GD.lblRedTeam.Text = "Red Team";
-					}
-
-                    var greenScore = match.Result.greenScore;
-                    var redScore = match.Result.redScore;
-
-                    if (greenScore != 0) {
-                        lblGreenScore.Text = greenScore.ToString();
-                    } else {
-                        lblGreenScore.Text = "000";
-                    }
-
-                    if (redScore != 0) {
-                        lblRedScore.Text = redScore.ToString();
-                    } else {
-                        lblRedScore.Text = "000";
-                    }
+				if (redTeam != null) {
+					lblRedTeam.Text = redTeam.name;
+					GD.lblRedTeam.Text = redTeam.name;
+				} else {
+					lblRedTeam.Text = "Red Team";
+					GD.lblRedTeam.Text = "Red Team";
 				}
+
+                var greenScore = match.greenScore;
+                var redScore = match.redScore;
+
+                if (greenScore != 0) {
+                    lblGreenScore.Text = greenScore.ToString();
+                } else {
+                    lblGreenScore.Text = "000";
+                }
+
+                if (redScore != 0) {
+                    lblRedScore.Text = redScore.ToString();
+                } else {
+                    lblRedScore.Text = "000";
+                }
 			} else {
 				string greenTeam = null;
 				string redTeam = null;
@@ -815,6 +802,130 @@ namespace YbotFieldControl
 			}
         }
 
+        // Only works for 2018 game
+        private void btnSeedBracket_Click (object sender, EventArgs e) {
+            if (generatedSeedBracketMatches) {
+                var dr = MessageBox.Show (
+                    "Are you sure you want to regenerate the seeded bracket matches", 
+                    "Seeded bracket matches are already generated", 
+                    MessageBoxButtons.YesNo);
+                if (dr == DialogResult.No) {
+                    return;
+                }
+            }
+
+            generatedSeedBracketMatches = true;
+            var seeding = new Dictionary<int, SchoolStandings> ();
+            for (int i = 1; i <= 18; ++i) {
+                var match = YbotSql.Instance.GetMatch (14, i);
+                if (match != null) {
+                    // Red Team
+                    if (!seeding.ContainsKey (match.redTeam)) {
+                        seeding.Add (match.redTeam, new SchoolStandings ());
+
+                        seeding[match.redTeam].name = YBotSqlData.Global.schools[match.redTeam].name;
+                        seeding[match.redTeam].id = match.redTeam;
+                    }
+
+                    switch (match.redResult) {
+                    case "W":
+                        seeding[match.redTeam].wins++;
+                        break;
+                    case "L":
+                        seeding[match.redTeam].loses++;
+                        break;
+                    case "T":
+                        seeding[match.redTeam].ties++;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    seeding[match.redTeam].average += match.redScore;
+                    seeding[match.redTeam].matchesPlayed++;
+
+                    if (seeding[match.redTeam].highest < match.redScore) {
+                        seeding[match.redTeam].highest = match.redScore;
+                    }
+
+                    // Green Team
+                    if (!seeding.ContainsKey (match.greenTeam)) {
+                        seeding.Add (match.greenTeam, new SchoolStandings ());
+                        seeding[match.greenTeam].name = YBotSqlData.Global.schools[match.greenTeam].name;
+                        seeding[match.greenTeam].id = match.greenTeam;
+                    }
+
+                    switch (match.greenResult) {
+                    case "W":
+                        seeding[match.greenTeam].wins++;
+                        break;
+                    case "L":
+                        seeding[match.greenTeam].loses++;
+                        break;
+                    case "T":
+                        seeding[match.greenTeam].ties++;
+                        break;
+                    default:
+                        break;
+                    }
+
+                    seeding[match.greenTeam].average += match.greenScore;
+                    seeding[match.greenTeam].matchesPlayed++;
+
+                    if (seeding[match.greenTeam].highest < match.greenScore) {
+                        seeding[match.greenTeam].highest = match.greenScore;
+                    }
+                }
+            }
+
+            foreach (var seed in seeding.Values) {
+                seed.average = seed.average / seed.matchesPlayed;
+            }
+
+            var seeds = new List<SchoolStandings> ();
+            // Top 4 teams
+            seeds.AddRange (from row in seeding.Values
+                            orderby row.wins descending, row.ties descending, row.loses, row.average descending, row.highest descending
+                            where row.id == 1 || row.id == 4 || row.id == 10 || row.id == 13
+                            select row);
+
+            // Remaining 3 teams
+            seeds.AddRange (from row in seeding.Values
+                            orderby row.wins descending, row.ties descending, row.loses, row.average descending, row.highest descending
+                            where row.id == 3 || row.id == 7 || row.id == 8
+                            select row);
+
+            var bracketMatch = new Match ();
+            bracketMatch.tournamentId = 14;
+            bracketMatch.matchNumber = 101;
+            // Seed 4
+            bracketMatch.greenTeam = seeds[3].id;
+            // Seed 5
+            bracketMatch.redTeam = seeds[4].id;
+            YbotSql.Instance.AddNewBracketMatch (bracketMatch);
+
+            bracketMatch.matchNumber = 102;
+            // Seed 2
+            bracketMatch.greenTeam = seeds[1].id;
+            // Seed 7
+            bracketMatch.redTeam = seeds[6].id;
+            YbotSql.Instance.AddNewBracketMatch (bracketMatch);
+
+            bracketMatch.matchNumber = 103;
+            // Seed 3
+            bracketMatch.greenTeam = seeds[2].id;
+            // Seed 6
+            bracketMatch.redTeam = seeds[5].id;
+            YbotSql.Instance.AddNewBracketMatch (bracketMatch);
+
+            bracketMatch.matchNumber = 104;
+            // Seed 1
+            bracketMatch.greenTeam = seeds[0].id;
+            // Waiting
+            bracketMatch.redTeam = 16;
+            YbotSql.Instance.AddNewBracketMatch (bracketMatch);
+        }
+
         private void DisableGameButtons () {
             btnStartGame.Enabled = false;
             btnSetupGame.Enabled = false;
@@ -849,92 +960,62 @@ namespace YbotFieldControl
 			var tournaments = YBotSqlData.Global.tournaments;
 			var index = tournaments.IndexOf(tournaments[lblTournamentName.Text]);
 
-			if (tournaments[index].name == "Championship") {
-				EnableRedTeam();
-			}
+            if (IsChampionshipMatch ()) {
+                DisableChampionshipButtons ();
+            }
 
-			index = ++index % tournaments.Count;
+            index = ++index % tournaments.Count;
 
-			if (tournaments[index].name == "Championship") {
-				DisableRedTeam();
-			}
-
-			lblTournamentName.Text = tournaments[index].name;
+            lblTournamentName.Text = tournaments[index].name;
 			YBotSqlData.Global.currentTournament = lblTournamentName.Text;
-		}
+
+            if (IsChampionshipMatch ()) {
+                EnableChampionshipButtons ();
+            }
+        }
 
         private void btnTournamentPrev_Click (object sender, EventArgs e) {
             var tournaments = YBotSqlData.Global.tournaments;
             var index = tournaments.IndexOf (tournaments[lblTournamentName.Text]);
 
-			if (tournaments[index].name == "Championship") {
-				EnableRedTeam();
-			}
+            if (IsChampionshipMatch ()) {
+                DisableChampionshipButtons ();
+            }
 
             index = --index;
             if (index < 0) {
                 index = tournaments.Count - 1;
             }
 
-			if (tournaments[index].name == "Championship") {
-				DisableRedTeam();
-			}
-
             lblTournamentName.Text = tournaments[index].name;
             YBotSqlData.Global.currentTournament = lblTournamentName.Text;
+
+            if (IsChampionshipMatch ()) {
+                EnableChampionshipButtons ();
+            }
         }
 
-		private void EnableRedTeam() {
-			btnDisableRed.Click += btnDisableRed_Click;
-			btnDisableRed.PerformClick();
-
-            lblChampionshipRounds.Visible = false;
-            btnChampionshipRoundNext.Visible = false;
-            btnChampionshipRoundPrevious.Visible = false;
-			lblRedDQ.Visible = true;
-			lblRedPenalty1.Visible = true;
-			lblRedPenalty3.Visible = true;
-			lblRedPenalty2.Visible = true;
-			grbRedScore.Visible = true;
-			grbRedPenalty.Visible = true;
-			lblRedTeam.Visible = true;
-			lblRedScore.Visible = true;
-			grbRedScore.Visible = true;
-			btnRedMantonomous.Visible = true;
-            btnAdvanceTeam.Visible = false;
-		}
-
-		private void DisableRedTeam() {
-			btnDisableRed.PerformClick();
-			btnDisableRed.Click -= btnDisableRed_Click;
-
+		private void EnableChampionshipButtons() {
             lblChampionshipRounds.Visible = true;
             btnChampionshipRoundNext.Visible = true;
             btnChampionshipRoundPrevious.Visible = true;
-            lblRedDQ.Visible = false;
-			lblRedPenalty1.Visible = false;
-			lblRedPenalty3.Visible = false;
-			lblRedPenalty2.Visible = false;
-			grbRedScore.Visible = false;
-			grbRedPenalty.Visible = false;
-			lblRedTeam.Visible = false;
-			lblRedScore.Visible = false;
-			grbRedScore.Visible = false;
-			btnRedMantonomous.Visible = false;
-            if (IsChampionshipBracketMatch()) {
-                btnAdvanceTeam.Visible = true;
-            } else {
-                btnAdvanceTeam.Visible = false;
-            }
-		}
+        }
+
+		private void DisableChampionshipButtons() {
+            lblChampionshipRounds.Visible = false;
+            btnChampionshipRoundNext.Visible = false;
+            btnChampionshipRoundPrevious.Visible = false;
+        }
 
         private void btnChampionshipRound_Click (object sender, EventArgs e) {
-            if (lblChampionshipRounds.Text == "Practice") {
+            if (lblChampionshipRounds.Text == "Round Robin") {
                 lblChampionshipRounds.Text = "Bracket";
-                btnAdvanceTeam.Visible = true;
+                matchNumber += 100;
+                btnSeedBracket.Visible = true;
             } else {
-                lblChampionshipRounds.Text = "Practice";
-                btnAdvanceTeam.Visible = false;
+                lblChampionshipRounds.Text = "Round Robin";
+                matchNumber -= 100;
+                btnSeedBracket.Visible = true;
             }
 			GetTeamNames();
         }

@@ -73,5 +73,30 @@ namespace YbotFieldControl
         public const int AUTO_LEFT_TOWER_PRESSED_SCORE = 25;
         public const int SPEED_BUTTON_PRESSED_SCORE = 10;
         public const int SPEED_SWITCH_TURNED_ON_SCORE = 50;
+
+        private class SchoolStandings
+        {
+            public int id;
+            public string name;
+            public int wins;
+            public int loses;
+            public int ties;
+            public double average;
+            public double highest;
+            public int matchesPlayed;
+
+            public SchoolStandings () {
+                id = 0;
+                name = null;
+                wins = 0;
+                loses = 0;
+                ties = 0;
+                average = 0d;
+                highest = 0d;
+                matchesPlayed = 0;
+            }
+        }
+
+        private bool generatedSeedBracketMatches = false;
     }
 }
